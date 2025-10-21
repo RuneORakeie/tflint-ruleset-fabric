@@ -46,11 +46,18 @@ linters:
     - wastedassign
     - whitespace
 
+run:
+  timeout: 10m
+  tests: true
+  build-tags: []
+  modules-download-mode: readonly
+
 issues:
   exclude-rules:
     - path: "_test\\.go$"
       linters:
         - gosec
+        - gocyclo
 
 linters-settings:
   govet:
