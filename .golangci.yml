@@ -21,7 +21,6 @@ linters:
     - errorlint
     - exhaustive
     - exportloopref
-    - gocheckcompileerrors
     - gocritic
     - godot
     - godox
@@ -47,6 +46,10 @@ linters:
     - wastedassign
     - whitespace
 
+output:
+  formats:
+    - format: colored-line-number
+
 issues:
   exclude-rules:
     - path: "_test\\.go$"
@@ -56,7 +59,8 @@ issues:
 
 linters-settings:
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   goimports:
     local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
   revive:
