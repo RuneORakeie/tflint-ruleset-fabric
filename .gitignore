@@ -1,0 +1,61 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.txt
+coverage.html
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# TFLint
+.tflint.d/
+tflint-ruleset-fabric
+tflint-ruleset-fabric.exe
+
+# Terraform
+.terraform/
+terraform.tfvars
+*.tfplan
+*.tfstate*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local development
+.env
+.env.local
+*.log
+
+# Build outputs
+dist/
+build/
+
+# GoReleaser
+dist/
+
+# General OS files
+.DS_Store
+Thumbs.db

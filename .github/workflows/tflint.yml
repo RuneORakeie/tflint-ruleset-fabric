@@ -1,0 +1,130 @@
+# .github/workflows/tflint.yml
+# GitHub Actions workflow for TFLint validation with Fabric ruleset
+
+name: TFLint Check
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**.tf'
+      - '.tflint.hcl'
+      - '.github/workflows/tflint.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**.tf'
+      - '.tflint.hcl'
+
+jobs:
+  tflint:
+    name: TFLint
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Setup Go (required for TFLint plugin compilation)
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+
+      # Cache Go modules
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      # Install TFLint
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      # Initialize TFLint plugins (including Fabric ruleset)
+      - name: Initialize TFLint
+        run: tflint --init
+        env:
+          TFLINT_PLUGIN_DIR: ~/.tflint.d/plugins
+
+      # Run TFLint with Fabric ruleset
+      - name: Run TFLint
+        run: |
+          tflint \
+            --format=compact \
+            --minimum-failure-severity=warning \
+            --recursive
+        continue-on-error: false
+
+      # Format check (optional)
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      # Generate TFLint report as artifact
+      - name: Generate TFLint Report
+        if: always()
+        run: |
+          tflint \
+            --format=sarif \
+            --recursive > tflint-report.sarif
+        continue-on-error: true
+
+      # Upload SARIF report to GitHub Security
+      - name: Upload TFLint Report to GitHub
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: tflint-report.sarif
+          category: tflint-fabric
+        continue-on-error: true
+
+      # Comment on PR with results
+      - name: Comment PR with TFLint Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('tflint-report.sarif', 'utf8'));
+            
+            if (report.runs[0]?.results?.length > 0) {
+              const issues = report.runs[0].results;
+              let comment = '## TFLint Check Results\n\n';
+              comment += `Found **${issues.length}** issue(s):\n\n`;
+              
+              issues.forEach(issue => {
+                const location = issue.locations[0];
+                const line = location.physicalLocation.region.startLine;
+                const message = issue.message.text;
+                comment += `- **${issue.ruleId}** (${issue.level}): ${message} (line ${line})\n`;
+              });
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '✅ TFLint check passed! All Fabric resources are properly configured.'
+              });
+            }
+        continue-on-error: true

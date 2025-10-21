@@ -1,0 +1,305 @@
+# .goreleaser.yml - Automated Release Configuration
+
+version: 2
+
+before:
+  hooks:
+    - go mod download
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -X main.Version={{ .Version }}
+      - -X main.Sha1ver={{ .Commit }}
+    binary: tflint-ruleset-fabric
+
+archives:
+  - format: zip
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+signs:
+  - cmd: gpg
+    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+    artifacts: all
+    stdin: "{{ .Env.GPG_PASSPHRASE }}"
+
+release:
+  github:
+    owner: RuneORakie
+    name: tflint-ruleset-fabric
+  prerelease: auto
+  draft: false
+  mode: replace
+  notes: |
+    ## TFLint Fabric Ruleset {{ .Version }}
+
+    ### New Features
+    {{ range .Commits.Group "features" }}
+    - {{ .Message }}
+    {{ end }}
+
+    ### Bug Fixes
+    {{ range .Commits.Group "fixes" }}
+    - {{ .Message }}
+    {{ end }}
+
+    ### Documentation
+    {{ range .Commits.Group "docs" }}
+    - {{ .Message }}
+    {{ end }}
+
+    See the [CHANGELOG](CHANGELOG.md) for full details.
+
+  name_template: "v{{ .Version }}"
+
+changelog:
+  use: github
+  groups:
+    - title: Features
+      regexp: "^.*feat(\\(.+\\))?!?:.+$"
+      order: 0
+    - title: Bug fixes
+      regexp: "^.*fix(\\(.+\\))?!?:.+$"
+      order: 1
+    - title: Documentation
+      regexp: "^.*docs(\\(.+\\))?!?:.+$"
+      order: 2
+    - title: Dependency updates
+      regexp: "^.*chore(\\(deps.*\\))?!?:.+$"
+      order: 3
+    - title: Other work
+      order: 999
+
+---
+# .github/workflows/release.yml - Automated Release Workflow
+
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          fingerprint: ${{ secrets.GPG_FINGERPRINT }}
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Update plugin registry
+        run: |
+          # Optional: Send release info to plugin registry
+          curl -X POST https://registry.example.com/plugins \
+            -H "Authorization: Bearer ${{ secrets.REGISTRY_TOKEN }}" \
+            -d @- << EOF
+          {
+            "name": "fabric",
+            "version": "${{ github.ref_name }}",
+            "source": "github.com/RuneORakeie/tflint-ruleset-fabric",
+            "releases": {
+              "linux_amd64": "https://github.com/RuneORakeie/tflint-ruleset-fabric/releases/download/${{ github.ref_name }}/tflint-ruleset-fabric_${{ github.ref_name }}_linux_amd64.zip",
+              "linux_arm64": "https://github.com/RuneORakeie/tflint-ruleset-fabric/releases/download/${{ github.ref_name }}/tflint-ruleset-fabric_${{ github.ref_name }}_linux_arm64.zip",
+              "darwin_amd64": "https://github.com/RuneORakeie/tflint-ruleset-fabric/releases/download/${{ github.ref_name }}/tflint-ruleset-fabric_${{ github.ref_name }}_darwin_amd64.zip",
+              "darwin_arm64": "https://github.com/RuneORakeie/tflint-ruleset-fabric/releases/download/${{ github.ref_name }}/tflint-ruleset-fabric_${{ github.ref_name }}_darwin_arm64.zip",
+              "windows_amd64": "https://github.com/RuneORakeie/tflint-ruleset-fabric/releases/download/${{ github.ref_name }}/tflint-ruleset-fabric_${{ github.ref_name }}_windows_amd64.zip"
+            }
+          }
+          EOF
+
+---
+# .github/workflows/test.yml - Continuous Integration Tests
+
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        go-version: ['1.24', '1.25']
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+
+      - name: Run tests
+        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.txt
+          flags: unittests
+          fail_ci_if_error: false
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          args: --timeout=10m
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+
+      - name: Build
+        run: go build -v .
+
+---
+# .golangci.yml - Linting Configuration
+
+linters:
+  enable:
+    - unused
+    - ineffassign
+    - misspell
+    - goimports
+    - revive
+    - vet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - typecheck
+    - asasalint
+    - asciicheck
+    - bidichk
+    - containedctx
+    - contextcheck
+    - decorder
+    - durationcheck
+    - errchkjson
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - gocheckcompileerrors
+    - gocritic
+    - godot
+    - godox
+    - goheader
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - nilerr
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - protogetter
+    - reassign
+    - sloglint
+    - tagliatelle
+    - tenv
+    - testableexamples
+    - tparallel
+    - unconvert
+    - unparam
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+
+issues:
+  exclude-rules:
+    - path: "_test\\.go$"
+      linters:
+        - gosec
+        - dupl
+
+linters-settings:
+  govet:
+    check-shadowing: true
+  goimports:
+    local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
+  revive:
+    severity: warning
+    rules:
+      - name: unused-parameter
+        disabled: true

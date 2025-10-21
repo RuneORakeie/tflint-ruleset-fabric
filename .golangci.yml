@@ -1,0 +1,66 @@
+linters:
+  enable:
+    - unused
+    - ineffassign
+    - misspell
+    - goimports
+    - revive
+    - vet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - typecheck
+    - asasalint
+    - asciicheck
+    - bidichk
+    - containedctx
+    - contextcheck
+    - decorder
+    - durationcheck
+    - errchkjson
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - gocheckcompileerrors
+    - gocritic
+    - godot
+    - godox
+    - goheader
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - nilerr
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - protogetter
+    - reassign
+    - sloglint
+    - tagliatelle
+    - tenv
+    - testableexamples
+    - tparallel
+    - unconvert
+    - unparam
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+
+issues:
+  exclude-rules:
+    - path: "_test\\.go$"
+      linters:
+        - gosec
+        - dupl
+
+linters-settings:
+  govet:
+    check-shadowing: true
+  goimports:
+    local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
+  revive:
+    severity: warning
+    rules:
+      - name: unused-parameter
+        disabled: true
