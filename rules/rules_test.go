@@ -8,139 +8,208 @@ import (
 
 // TestFabricWorkspaceNaming tests workspace naming rule
 func TestFabricWorkspaceNaming(t *testing.T) {
-	cases := []struct {
-		Name     string
-		Content  string
-		Expected helper.Issues
+	tests := []struct {
+		name     string
+		content  string
+		hasIssue bool
 	}{
 		{
-			Name: "valid naming - lowercase with hyphens",
-			Content: `
+			name: "valid naming - lowercase with hyphens",
+			content: `
 resource "fabric_workspace" "example" {
   display_name = "valid-workspace-name"
   description  = "Test workspace"
   capacity_id  = "capacity-123"
 }`,
-			Expected: helper.Issues{},
+			hasIssue: false,
 		},
 		{
-			Name: "invalid naming - uppercase letters",
-			Content: `
+			name: "invalid naming - uppercase letters",
+			content: `
 resource "fabric_workspace" "example" {
   display_name = "INVALID-WORKSPACE-NAME"
   description  = "Test workspace"
   capacity_id  = "capacity-123"
 }`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewFabricWorkspaceNaming(),
-					Message: "Workspace name should be 3-50 characters and contain only lowercase letters, numbers, and hyphens",
-				},
-			},
+			hasIssue: true,
 		},
 		{
-			Name: "invalid naming - too short",
-			Content: `
+			name: "invalid naming - too short",
+			content: `
 resource "fabric_workspace" "example" {
   display_name = "ab"
   description  = "Test workspace"
   capacity_id  = "capacity-123"
 }`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewFabricWorkspaceNaming(),
-					Message: "Workspace name should be 3-50 characters and contain only lowercase letters, numbers, and hyphens",
-				},
-			},
+			hasIssue: true,
+		},
+		{
+			name: "valid naming - exactly 3 characters",
+			content: `
+resource "fabric_workspace" "example" {
+  display_name = "abc"
+  description  = "Test workspace"
+  capacity_id  = "capacity-123"
+}`,
+			hasIssue: false,
+		},
+		{
+			name: "invalid naming - too long",
+			content: `
+resource "fabric_workspace" "example" {
+  display_name = "this-is-a-very-long-workspace-name-that-exceeds-fifty-characters-limit"
+  description  = "Test workspace"
+  capacity_id  = "capacity-123"
+}`,
+			hasIssue: true,
+		},
+		{
+			name: "invalid naming - special characters",
+			content: `
+resource "fabric_workspace" "example" {
+  display_name = "workspace@123!"
+  description  = "Test workspace"
+  capacity_id  = "capacity-123"
+}`,
+			hasIssue: true,
 		},
 	}
 
-	runner := helper.TestRunner(t, cases)
-	rule := NewFabricWorkspaceNaming()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			runner := helper.TestRunner(t, map[string]string{
+				"main.tf": tt.content,
+			})
+			rule := NewFabricWorkspaceNaming()
 
-	if err := rule.Check(runner); err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+			if err := rule.Check(runner); err != nil {
+				t.Fatalf("Unexpected error: %s", err)
+			}
+
+			if tt.hasIssue && len(runner.Issues) == 0 {
+				t.Errorf("Expected issues but got none")
+			}
+			if !tt.hasIssue && len(runner.Issues) > 0 {
+				t.Errorf("Expected no issues but got %d", len(runner.Issues))
+			}
+		})
 	}
 }
 
 // TestFabricWorkspaceCapacity tests capacity requirement rule
 func TestFabricWorkspaceCapacity(t *testing.T) {
-	cases := []struct {
-		Name     string
-		Content  string
-		Expected helper.Issues
+	tests := []struct {
+		name     string
+		content  string
+		hasIssue bool
 	}{
 		{
-			Name: "valid - capacity assigned",
-			Content: `
+			name: "valid - capacity assigned",
+			content: `
 resource "fabric_workspace" "example" {
   display_name = "test-workspace"
   description  = "Test"
   capacity_id  = "capacity-123"
 }`,
-			Expected: helper.Issues{},
+			hasIssue: false,
 		},
 		{
-			Name: "invalid - no capacity assigned",
-			Content: `
+			name: "invalid - no capacity assigned",
+			content: `
 resource "fabric_workspace" "example" {
   display_name = "test-workspace"
   description  = "Test"
 }`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewFabricWorkspaceCapacity(),
-					Message: "Workspace should have a capacity assigned for production use",
-				},
-			},
+			hasIssue: true,
+		},
+		{
+			name: "valid - capacity assigned with variable",
+			content: `
+resource "fabric_workspace" "example" {
+  display_name = "test-workspace"
+  description  = "Test"
+  capacity_id  = var.capacity_id
+}`,
+			hasIssue: false,
 		},
 	}
 
-	runner := helper.TestRunner(t, cases)
-	rule := NewFabricWorkspaceCapacity()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			runner := helper.TestRunner(t, map[string]string{
+				"main.tf": tt.content,
+			})
+			rule := NewFabricWorkspaceCapacity()
 
-	if err := rule.Check(runner); err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+			if err := rule.Check(runner); err != nil {
+				t.Fatalf("Unexpected error: %s", err)
+			}
+
+			if tt.hasIssue && len(runner.Issues) == 0 {
+				t.Errorf("Expected issues but got none")
+			}
+			if !tt.hasIssue && len(runner.Issues) > 0 {
+				t.Errorf("Expected no issues but got %d", len(runner.Issues))
+			}
+		})
 	}
 }
 
 // TestFabricWorkspaceDescription tests description requirement rule
 func TestFabricWorkspaceDescription(t *testing.T) {
-	cases := []struct {
-		Name     string
-		Content  string
-		Expected helper.Issues
+	tests := []struct {
+		name     string
+		content  string
+		hasIssue bool
 	}{
 		{
-			Name: "valid - description provided",
-			Content: `
+			name: "valid - description provided",
+			content: `
 resource "fabric_workspace" "example" {
   display_name = "test-workspace"
   description  = "This is a test workspace"
   capacity_id  = "capacity-123"
 }`,
-			Expected: helper.Issues{},
+			hasIssue: false,
 		},
 		{
-			Name: "invalid - no description",
-			Content: `
+			name: "invalid - no description",
+			content: `
 resource "fabric_workspace" "example" {
   display_name = "test-workspace"
   capacity_id  = "capacity-123"
 }`,
-			Expected: helper.Issues{
-				{
-					Rule:    NewFabricWorkspaceDescription(),
-					Message: "Workspace should have a description for governance and documentation",
-				},
-			},
+			hasIssue: true,
+		},
+		{
+			name: "valid - description from variable",
+			content: `
+resource "fabric_workspace" "example" {
+  display_name = "test-workspace"
+  description  = var.workspace_description
+  capacity_id  = "capacity-123"
+}`,
+			hasIssue: false,
 		},
 	}
 
-	runner := helper.TestRunner(t, cases)
-	rule := NewFabricWorkspaceDescription()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			runner := helper.TestRunner(t, map[string]string{
+				"main.tf": tt.content,
+			})
+			rule := NewFabricWorkspaceDescription()
 
-	if err := rule.Check(runner); err != nil {
-		t.Fatalf("Unexpected error: %s", err)
+			if err := rule.Check(runner); err != nil {
+				t.Fatalf("Unexpected error: %s", err)
+			}
+
+			if tt.hasIssue && len(runner.Issues) == 0 {
+				t.Errorf("Expected issues but got none")
+			}
+			if !tt.hasIssue && len(runner.Issues) > 0 {
+				t.Errorf("Expected no issues but got %d", len(runner.Issues))
+			}
+		})
 	}
 }
