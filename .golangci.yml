@@ -5,7 +5,7 @@ linters:
     - misspell
     - goimports
     - revive
-    - vet
+    - govet
     - errcheck
     - staticcheck
     - gosimple
@@ -15,12 +15,12 @@ linters:
     - bidichk
     - containedctx
     - contextcheck
+    - copyloopvar
     - decorder
     - durationcheck
     - errchkjson
     - errorlint
     - exhaustive
-    - exportloopref
     - gocritic
     - godot
     - godox
@@ -37,18 +37,14 @@ linters:
     - reassign
     - sloglint
     - tagliatelle
-    - tenv
     - testableexamples
     - tparallel
     - unconvert
     - unparam
     - usestdlibvars
+    - usetesting
     - wastedassign
     - whitespace
-
-output:
-  formats:
-    - format: colored-line-number
 
 issues:
   exclude-rules:
