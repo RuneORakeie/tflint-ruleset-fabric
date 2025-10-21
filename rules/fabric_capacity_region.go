@@ -2,10 +2,8 @@ package rules
 
 import (
 	"fmt"
-	"regexp"
 
-	"github.com/terraform-linters/tflint-plugin-sdk/hcl"
-	"github.com/terraform-linters/tflint-plugin-sdk/logger"
+	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
@@ -26,7 +24,7 @@ func (r *FabricCapacityRegion) Enabled() bool {
 	return false // Disabled by default, enable if needed
 }
 
-func (r *FabricCapacityRegion) Severity() string {
+func (r *FabricCapacityRegion) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
@@ -35,32 +33,35 @@ func (r *FabricCapacityRegion) Link() string {
 }
 
 func (r *FabricCapacityRegion) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourcesByType("fabric_capacity")
+	resources, err := runner.GetResourceContent("fabric_capacity", &hclext.BodySchema{
+		Attributes: []hclext.AttributeSchema{
+			{Name: "region"},
+		},
+	}, nil)
 	if err != nil {
 		return err
 	}
 
 	validRegions := map[string]bool{
-		"eastus":      true,
-		"westus":      true,
-		"westeurope":  true,
-		"eastasia":    true,
+		"eastus":        true,
+		"westus":        true,
+		"westeurope":    true,
+		"eastasia":      true,
 		"southeastasia": true,
-		"uksouth":     true,
+		"uksouth":       true,
 		"australiaeast": true,
 		"canadacentral": true,
-		"brazilsouth": true,
+		"brazilsouth":   true,
 	}
 
-	for _, resource := range resources {
+	if attr, exists := resources.Attributes["region"]; exists && attr.Expr != nil {
 		var region string
-		err := resource.GetAttribute("region", &region)
-		if err == nil && region != "" {
+		if err := runner.EvaluateExpr(attr.Expr, &region, nil); err == nil && region != "" {
 			if !validRegions[region] {
 				runner.EmitIssue(
 					r,
 					fmt.Sprintf("Region %s may not be available. Please verify with Microsoft Fabric documentation", region),
-					resource.GetNameRange(),
+					attr.Range,
 				)
 			}
 		}

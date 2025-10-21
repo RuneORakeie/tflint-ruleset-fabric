@@ -2,10 +2,8 @@ package rules
 
 import (
 	"fmt"
-	"regexp"
 
-	"github.com/terraform-linters/tflint-plugin-sdk/hcl"
-	"github.com/terraform-linters/tflint-plugin-sdk/logger"
+	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
@@ -26,7 +24,7 @@ func (r *FabricGitIntegrationValidation) Enabled() bool {
 	return true
 }
 
-func (r *FabricGitIntegrationValidation) Severity() string {
+func (r *FabricGitIntegrationValidation) Severity() tflint.Severity {
 	return tflint.ERROR
 }
 
@@ -35,7 +33,11 @@ func (r *FabricGitIntegrationValidation) Link() string {
 }
 
 func (r *FabricGitIntegrationValidation) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourcesByType("fabric_workspace_git_connection")
+	resources, err := runner.GetResourceContent("fabric_workspace_git_connection", &hclext.BodySchema{
+		Attributes: []hclext.AttributeSchema{
+			{Name: "git_provider_type"},
+		},
+	}, nil)
 	if err != nil {
 		return err
 	}
@@ -43,17 +45,18 @@ func (r *FabricGitIntegrationValidation) Check(runner tflint.Runner) error {
 	validProviders := map[string]bool{
 		"GitHub":           true,
 		"Azure DevOps":     true,
+		"Bitbucket Cloud":  true,
+		"GitLab":           true,
 	}
 
-	for _, resource := range resources {
+	if attr, exists := resources.Attributes["git_provider_type"]; exists && attr.Expr != nil {
 		var provider string
-		err := resource.GetAttribute("git_provider_type", &provider)
-		if err == nil && provider != "" {
+		if err := runner.EvaluateExpr(attr.Expr, &provider, nil); err == nil && provider != "" {
 			if !validProviders[provider] {
 				runner.EmitIssue(
 					r,
-					fmt.Sprintf("Invalid Git provider: %s. Must be one of: GitHub or Azure DevOps", provider),
-					resource.GetNameRange(),
+					fmt.Sprintf("Invalid Git provider: %s. Must be one of: GitHub, Azure DevOps, Bitbucket Cloud, GitLab", provider),
+					attr.Range,
 				)
 			}
 		}

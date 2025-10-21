@@ -1,11 +1,8 @@
 package rules
 
 import (
-	"fmt"
-	"regexp"
-
-	"github.com/terraform-linters/tflint-plugin-sdk/hcl"
-	"github.com/terraform-linters/tflint-plugin-sdk/logger"
+	"github.com/hashicorp/hcl/v2"
+	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
@@ -26,7 +23,7 @@ func (r *FabricWorkspaceDescription) Enabled() bool {
 	return true
 }
 
-func (r *FabricWorkspaceDescription) Severity() string {
+func (r *FabricWorkspaceDescription) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
@@ -35,23 +32,30 @@ func (r *FabricWorkspaceDescription) Link() string {
 }
 
 func (r *FabricWorkspaceDescription) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourcesByType("fabric_workspace")
+	resources, err := runner.GetResourceContent("fabric_workspace", &hclext.BodySchema{
+		Attributes: []hclext.AttributeSchema{
+			{Name: "description"},
+		},
+	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources {
-		var description string
-		err := resource.GetAttribute("description", &description)
-		if err != nil || description == "" {
-			runner.EmitIssue(
-				r,
-				"Workspace should have a description for governance and documentation",
-				resource.GetNameRange(),
-			)
+	if attr, exists := resources.Attributes["description"]; !exists || attr.Expr == nil {
+		// Use the first block's DefRange (resource definition range)
+		var issueRange hcl.Range
+		if len(resources.Blocks) > 0 {
+			issueRange = resources.Blocks[0].DefRange
+		} else if attr != nil {
+			issueRange = attr.Range
 		}
+		
+		runner.EmitIssue(
+			r,
+			"Workspace should have a description for governance and documentation",
+			issueRange,
+		)
 	}
 
 	return nil
 }
-

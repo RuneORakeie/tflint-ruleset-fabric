@@ -1,11 +1,9 @@
 package rules
 
 import (
-	"fmt"
 	"regexp"
 
-	"github.com/terraform-linters/tflint-plugin-sdk/hcl"
-	"github.com/terraform-linters/tflint-plugin-sdk/logger"
+	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
@@ -26,7 +24,7 @@ func (r *FabricWorkspaceNaming) Enabled() bool {
 	return true
 }
 
-func (r *FabricWorkspaceNaming) Severity() string {
+func (r *FabricWorkspaceNaming) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
@@ -35,25 +33,25 @@ func (r *FabricWorkspaceNaming) Link() string {
 }
 
 func (r *FabricWorkspaceNaming) Check(runner tflint.Runner) error {
-	logger := logger.New()
-	logger.Debug("Checking Fabric workspace naming conventions")
-
-	resources, err := runner.GetResourcesByType("fabric_workspace")
+	resources, err := runner.GetResourceContent("fabric_workspace", &hclext.BodySchema{
+		Attributes: []hclext.AttributeSchema{
+			{Name: "display_name"},
+		},
+	}, nil)
 	if err != nil {
 		return err
 	}
 
 	namePattern := regexp.MustCompile(`^[a-z0-9\-]{3,50}$`)
 
-	for _, resource := range resources {
+	if attr, exists := resources.Attributes["display_name"]; exists && attr.Expr != nil {
 		var name string
-		err := resource.GetAttribute("display_name", &name)
-		if err == nil && name != "" {
+		if err := runner.EvaluateExpr(attr.Expr, &name, nil); err == nil && name != "" {
 			if !namePattern.MatchString(name) {
 				runner.EmitIssue(
 					r,
 					"Workspace name should be 3-50 characters and contain only lowercase letters, numbers, and hyphens",
-					resource.GetNameRange(),
+					attr.Range,
 				)
 			}
 		}
