@@ -1,7 +1,6 @@
 package rules
 
 import (
-	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
@@ -41,20 +40,15 @@ func (r *FabricWorkspaceCapacity) Check(runner tflint.Runner) error {
 		return err
 	}
 
-	if attr, exists := resources.Attributes["capacity_id"]; !exists || attr.Expr == nil {
-		// Use the first block's DefRange (resource definition range)
-		var issueRange hcl.Range
-		if len(resources.Blocks) > 0 {
-			issueRange = resources.Blocks[0].DefRange
-		} else if attr != nil {
-			issueRange = attr.Range
+	// Iterate over all resources
+	for _, resource := range resources {
+		if attr, exists := resource.Attributes["capacity_id"]; !exists || attr.Expr == nil {
+			runner.EmitIssue(
+				r,
+				"Workspace should have a capacity assigned for production use",
+				resource.DefRange,
+			)
 		}
-		
-		runner.EmitIssue(
-			r,
-			"Workspace should have a capacity assigned for production use",
-			issueRange,
-		)
 	}
 
 	return nil

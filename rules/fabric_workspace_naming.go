@@ -44,15 +44,18 @@ func (r *FabricWorkspaceNaming) Check(runner tflint.Runner) error {
 
 	namePattern := regexp.MustCompile(`^[a-z0-9\-]{3,50}$`)
 
-	if attr, exists := resources.Attributes["display_name"]; exists && attr.Expr != nil {
-		var name string
-		if err := runner.EvaluateExpr(attr.Expr, &name, nil); err == nil && name != "" {
-			if !namePattern.MatchString(name) {
-				runner.EmitIssue(
-					r,
-					"Workspace name should be 3-50 characters and contain only lowercase letters, numbers, and hyphens",
-					attr.Range,
-				)
+	// Iterate over all resources
+	for _, resource := range resources {
+		if attr, exists := resource.Attributes["display_name"]; exists && attr.Expr != nil {
+			var name string
+			if err := runner.EvaluateExpr(attr.Expr, &name, nil); err == nil && name != "" {
+				if !namePattern.MatchString(name) {
+					runner.EmitIssue(
+						r,
+						"Workspace name should be 3-50 characters and contain only lowercase letters, numbers, and hyphens",
+						attr.Range,
+					)
+				}
 			}
 		}
 	}
