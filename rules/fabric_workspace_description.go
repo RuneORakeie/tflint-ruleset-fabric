@@ -31,7 +31,7 @@ func (r *FabricWorkspaceDescription) Link() string {
 }
 
 func (r *FabricWorkspaceDescription) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent("fabric_workspace", &hclext.BodySchema{
+	resourceContent, err := runner.GetResourceContent("fabric_workspace", &hclext.BodySchema{
 		Attributes: []hclext.AttributeSchema{
 			{Name: "description"},
 		},
@@ -40,9 +40,9 @@ func (r *FabricWorkspaceDescription) Check(runner tflint.Runner) error {
 		return err
 	}
 
-	// Iterate over all resources
-	for _, resource := range resources {
-		if attr, exists := resource.Attributes["description"]; !exists || attr.Expr == nil {
+	// Iterate over all resource blocks
+	for _, resource := range resourceContent.Blocks {
+		if attr, exists := resource.Body.Attributes["description"]; !exists || attr.Expr == nil {
 			runner.EmitIssue(
 				r,
 				"Workspace should have a description for governance and documentation",

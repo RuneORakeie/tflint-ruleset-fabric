@@ -33,7 +33,7 @@ func (r *FabricWorkspaceNaming) Link() string {
 }
 
 func (r *FabricWorkspaceNaming) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent("fabric_workspace", &hclext.BodySchema{
+	resourceContent, err := runner.GetResourceContent("fabric_workspace", &hclext.BodySchema{
 		Attributes: []hclext.AttributeSchema{
 			{Name: "display_name"},
 		},
@@ -44,9 +44,9 @@ func (r *FabricWorkspaceNaming) Check(runner tflint.Runner) error {
 
 	namePattern := regexp.MustCompile(`^[a-z0-9\-]{3,50}$`)
 
-	// Iterate over all resources
-	for _, resource := range resources {
-		if attr, exists := resource.Attributes["display_name"]; exists && attr.Expr != nil {
+	// Iterate over all resource blocks
+	for _, resource := range resourceContent.Blocks {
+		if attr, exists := resource.Body.Attributes["display_name"]; exists && attr.Expr != nil {
 			var name string
 			if err := runner.EvaluateExpr(attr.Expr, &name, nil); err == nil && name != "" {
 				if !namePattern.MatchString(name) {
