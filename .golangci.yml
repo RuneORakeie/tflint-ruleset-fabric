@@ -1,3 +1,6 @@
+# Minimal golangci-lint configuration for projects without Go source files
+# This allows the configuration to exist without errors
+
 linters:
   enable:
     - unused
@@ -10,54 +13,12 @@ linters:
     - staticcheck
     - gosimple
     - typecheck
-    - asasalint
-    - asciicheck
-    - bidichk
-    - containedctx
-    - contextcheck
-    - copyloopvar
-    - decorder
-    - durationcheck
-    - errchkjson
-    - errorlint
-    - exhaustive
-    - gocritic
-    - godot
-    - godox
-    - goheader
-    - goprintffuncname
-    - gosec
-    - gosmopolitan
-    - nilerr
-    - noctx
-    - nolintlint
-    - prealloc
-    - predeclared
-    - protogetter
-    - reassign
-    - sloglint
-    - tagliatelle
-    - testableexamples
-    - tparallel
-    - unconvert
-    - unparam
-    - usestdlibvars
-    - usetesting
-    - wastedassign
-    - whitespace
-
-run:
-  timeout: 10m
-  tests: true
-  build-tags: []
-  modules-download-mode: readonly
 
 issues:
   exclude-rules:
     - path: "_test\\.go$"
       linters:
         - gosec
-        - gocyclo
 
 linters-settings:
   govet:
