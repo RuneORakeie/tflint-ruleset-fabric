@@ -1,0 +1,12 @@
+package apispec
+
+import (
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+)
+
+// Rules returns all generated rules
+func Rules() []tflint.Rule {
+	return []tflint.Rule{
+{{ range .RuleNameCCList }}		New{{ . }}(),
+{{ end }}	}
+}

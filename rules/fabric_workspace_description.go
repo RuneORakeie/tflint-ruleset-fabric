@@ -3,6 +3,7 @@ package rules
 import (
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceDescription ensures workspaces have descriptions
@@ -27,7 +28,7 @@ func (r *FabricWorkspaceDescription) Severity() tflint.Severity {
 }
 
 func (r *FabricWorkspaceDescription) Link() string {
-	return "https://learn.microsoft.com/en-us/fabric/admin/fabric-governance"
+	return project.ReferenceLink(r.Name())
 }
 
 func (r *FabricWorkspaceDescription) Check(runner tflint.Runner) error {

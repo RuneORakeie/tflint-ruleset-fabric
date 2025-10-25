@@ -3,6 +3,7 @@ package rules
 import (
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceCapacity ensures capacity is assigned to workspaces
@@ -27,7 +28,7 @@ func (r *FabricWorkspaceCapacity) Severity() tflint.Severity {
 }
 
 func (r *FabricWorkspaceCapacity) Link() string {
-	return "https://learn.microsoft.com/en-us/fabric/admin/capacity-settings"
+	return project.ReferenceLink(r.Name())
 }
 
 func (r *FabricWorkspaceCapacity) Check(runner tflint.Runner) error {

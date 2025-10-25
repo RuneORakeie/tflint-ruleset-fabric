@@ -35,6 +35,9 @@ jobs:
       - name: Run tests
         run: go test -v -race -coverprofile="coverage.txt" -covermode="atomic" ./...
 
+      - name: Test generated rules
+        run: go test -v ./rules -run TestGenerated
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         if: runner.os == 'Linux'

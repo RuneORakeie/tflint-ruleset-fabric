@@ -1,0 +1,63 @@
+package apispec
+
+import (
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+)
+
+// Rules returns all generated rules
+func Rules() []tflint.Rule {
+	return []tflint.Rule{
+		NewFabricActivatorInvalidDescription(),
+		NewFabricApacheAirflowJobInvalidDescription(),
+		NewFabricConnectionInvalidConnectivityType(),
+		NewFabricConnectionInvalidDisplayName(),
+		NewFabricConnectionInvalidPrivacyLevel(),
+		NewFabricCopyJobInvalidDescription(),
+		NewFabricCopyJobInvalidDisplayName(),
+		NewFabricDataPipelineInvalidDescription(),
+		NewFabricDataPipelineInvalidDisplayName(),
+		NewFabricDataflowInvalidDescription(),
+		NewFabricDataflowInvalidDisplayName(),
+		NewFabricDeploymentPipelineInvalidDescription(),
+		NewFabricDeploymentPipelineInvalidDisplayName(),
+		NewFabricDigitalTwinBuilderInvalidDescription(),
+		NewFabricDomainInvalidDescription(),
+		NewFabricDomainInvalidDisplayName(),
+		NewFabricEnvironmentInvalidDescription(),
+		NewFabricEventhouseInvalidDescription(),
+		NewFabricEventhouseInvalidDisplayName(),
+		NewFabricEventstreamInvalidDescription(),
+		NewFabricEventstreamInvalidDisplayName(),
+		NewFabricFolderInvalidDisplayName(),
+		NewFabricGatewayInvalidType(),
+		NewFabricGraphqlAPIInvalidDescription(),
+		NewFabricKQLDashboardInvalidDescription(),
+		NewFabricKQLDatabaseInvalidDescription(),
+		NewFabricKQLQuerysetInvalidDescription(),
+		NewFabricLakehouseInvalidDescription(),
+		NewFabricLakehouseInvalidDisplayName(),
+		NewFabricMirroredDatabaseInvalidDescription(),
+		NewFabricMlExperimentInvalidDescription(),
+		NewFabricMlModelInvalidDescription(),
+		NewFabricMountedDataFactoryInvalidDescription(),
+		NewFabricNotebookInvalidDescription(),
+		NewFabricNotebookInvalidDisplayName(),
+		NewFabricReportInvalidDescription(),
+		NewFabricSQLDatabaseInvalidDescription(),
+		NewFabricSemanticModelInvalidDescription(),
+		NewFabricSparkCustomPoolInvalidNodeFamily(),
+		NewFabricSparkCustomPoolInvalidNodeSize(),
+		NewFabricSparkEnvironmentSettingsInvalidDriverCores(),
+		NewFabricSparkEnvironmentSettingsInvalidDriverMemory(),
+		NewFabricSparkEnvironmentSettingsInvalidExecutorCores(),
+		NewFabricSparkEnvironmentSettingsInvalidExecutorMemory(),
+		NewFabricSparkEnvironmentSettingsInvalidRuntimeVersion(),
+		NewFabricSparkJobDefinitionInvalidDescription(),
+		NewFabricSparkJobDefinitionInvalidDisplayName(),
+		NewFabricVariableLibraryInvalidDescription(),
+		NewFabricWarehouseInvalidDescription(),
+		NewFabricWarehouseSnapshotInvalidDescription(),
+		NewFabricWorkspaceInvalidDescription(),
+		NewFabricWorkspaceInvalidDisplayName(),
+	}
+}

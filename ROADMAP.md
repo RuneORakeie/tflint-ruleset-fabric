@@ -1,267 +1,304 @@
 # Roadmap
 
-TFLint Ruleset for Fabric Terraform Provider - Feature Roadmap
+TFLint Ruleset for Fabric Terraform Provider - Development Roadmap
 
-## Current Release (v0.1.0) ✅
+## Current Status (v0.1.0-dev)
 
-### Core Implementation
-- ✅ 6 validation rules for Fabric resources
-- ✅ Complete test suite (85%+ coverage)
-- ✅ Full documentation (3,500+ lines)
-- ✅ CI/CD pipelines
-- ✅ Multi-platform builds
-- ✅ Example configurations
+### ✅ Completed Features
 
-### Documentation
-- ✅ Quick start guide
-- ✅ Complete README
-- ✅ Contributing guide
-- ✅ Troubleshooting guide
-- ✅ Architecture documentation
-- ✅ Advanced topics
+**70+ Validation Rules**
+- ✅ 17 business logic rules for governance
+- ✅ 53 auto-generated API spec rules
+- ✅ Comprehensive test coverage (business logic rules)
+- ✅ Full documentation for all rules
 
-### Status: Released October 2025
+**Infrastructure**
+- ✅ Rule generation framework
+- ✅ Testing framework
+- ✅ Documentation generator
+- ✅ Project structure and tooling
+
+**Documentation**
+- ✅ Individual rule documentation (70+ pages)
+- ✅ README with examples
+- ✅ Contributing guidelines
+- ✅ Code of conduct
+
+### 🔄 In Progress
+- Testing framework for API spec rules
+- CI/CD pipeline setup
+- Release automation
 
 ---
 
-## Q1 2025 (Next Release - v0.2.0)
+## Q1 2026 (v0.1.0 - First Official Release)
+
+### Goals
+- First stable release with 70+ rules
+- Complete test coverage
+- CI/CD automation
+- Initial community release
+
+### Planned Features
+- ✅ All 70+ rules fully tested
+- ✅ GitHub Actions CI/CD
+- ✅ Automated releases via GoReleaser
+- ✅ GitHub release artifacts
+- ✅ Installation via TFLint plugin system
+
+### Testing & Quality
+- Complete test coverage for all rules
+- Integration test suite
+- Example configurations
+- Documentation review
+
+**Target Release**: January 2026
+
+---
+
+## Q2 2026 (v0.2.0)
 
 ### New Rules
 - [ ] `fabric_workspace_tags_required` - Enforce workspace tagging
-- [ ] `fabric_workspace_capacity_auto_scaling` - Validate auto-scaling settings
-- [ ] `fabric_capacity_sku_validation` - Validate SKU tier selection
-- [ ] `fabric_workspace_retention_policy` - Validate retention settings
+- [ ] `fabric_naming_convention` - Configurable naming patterns
+- [ ] `fabric_lakehouse_shortcut_validation` - Shortcut configuration rules
+- [ ] `fabric_semantic_model_validation` - Semantic model rules
 
 ### Enhancements
-- [ ] Add configurable rule parameters
-- [ ] Support for rule presets (minimal, recommended, strict)
-- [ ] Better error messages with remediation suggestions
+- [ ] Configurable rule parameters
+- [ ] Rule presets (minimal, recommended, strict)
+- [ ] Better error messages with fix suggestions
 - [ ] Performance optimizations
 
 ### Documentation
 - [ ] Video tutorials
-- [ ] More detailed rule examples
 - [ ] Migration guides
 - [ ] Best practices guide
+- [ ] Rule cookbook
 
-### Expected Release: Q1 2025
+**Target Release**: April 2026
 
 ---
 
-## Q2 2025 (v0.3.0)
+## Q3 2026 (v0.3.0)
 
 ### Advanced Rules
-- [ ] `fabric_item_governance` - Item-level governance rules
-- [ ] `fabric_permission_least_privilege` - Enforce least privilege
-- [ ] `fabric_cost_optimization` - Cost optimization recommendations
-- [ ] `fabric_capacity_regional_compliance` - Regional compliance
+- [ ] `fabric_capacity_optimization` - Cost optimization recommendations
+- [ ] `fabric_permission_least_privilege` - Permission validation
+- [ ] `fabric_data_governance` - Data classification rules
+- [ ] `fabric_compliance_validation` - Compliance checks
 
 ### Tool Integration
-- [ ] VS Code extension integration
-- [ ] IDE plugin support
-- [ ] Pre-commit framework support
+- [ ] VS Code extension
+- [ ] Pre-commit hooks
 - [ ] Terraform Cloud integration
+- [ ] Azure DevOps pipeline task
 
-### CI/CD Integration
-- [ ] GitHub App for automated checks
-- [ ] GitLab runner
-- [ ] Azure Pipelines task
-- [ ] Jenkins plugin
+### Features
+- [ ] Custom rule templates
+- [ ] Rule suppression system
+- [ ] Configuration validation
+- [ ] Bulk rule enable/disable
 
-### Expected Release: Q2 2025
+**Target Release**: July 2026
 
 ---
 
-## Q3 2025 (v0.4.0)
+## Q4 2026 (v0.4.0)
 
 ### Enterprise Features
-- [ ] Rule suppression/exemption system
 - [ ] Audit logging
 - [ ] Compliance reporting
 - [ ] Policy as Code support
+- [ ] Multi-workspace validation
 
-### Custom Rules
-- [ ] OPA/Rego integration
-- [ ] Rule templating system
-- [ ] Custom rule generator
+### Advanced Validation
+- [ ] Cross-resource dependency checks
+- [ ] Capacity utilization warnings
+- [ ] Cost estimation
+- [ ] Security scanning
+
+### Community
 - [ ] Community rule library
+- [ ] Rule contribution framework
+- [ ] Public rule registry
+- [ ] Community voting on features
 
-### Testing & Quality
-- [ ] Increased test coverage (95%+)
-- [ ] Performance benchmarking
-- [ ] Security audit
-- [ ] SBOM generation
-
-### Expected Release: Q3 2025
+**Target Release**: October 2026
 
 ---
 
-## Q4 2025 (v1.0.0)
+## 2027+ (Long-term Vision)
 
-### Major Release
-- [ ] All enterprise features stable
-- [ ] Comprehensive rule set (20+ rules)
-- [ ] Production readiness certification
-- [ ] LTS support promise
+### v1.0.0 - Enterprise Ready
+- [ ] 100+ validation rules
+- [ ] LTS support
+- [ ] Enterprise SLA
+- [ ] Professional support options
+- [ ] Certification program
 
-### Documentation
-- [ ] Official Microsoft partnership announcement
-- [ ] Enterprise deployment guide
-- [ ] Multi-organization support guide
-- [ ] Governance framework
-
-### Performance
-- [ ] Sub-100ms execution on large projects
-- [ ] Memory optimization
-- [ ] Parallel rule execution
-- [ ] Distributed rule processing
-
-### Expected Release: Q4 2025
-
----
-
-## Future Roadmap (2026+)
-
-### v1.1.0+ Plans
+### Advanced Features
 - [ ] Real-time monitoring integration
 - [ ] Drift detection
-- [ ] Compliance dashboards
+- [ ] Automatic remediation suggestions
 - [ ] Integration with Fabric admin portal
 
-### v2.0.0 Plans
+### Innovation
 - [ ] ML-based anomaly detection
-- [ ] Advanced cost optimization
 - [ ] Predictive compliance
-- [ ] AI-assisted remediation
-
-### Long-term Vision
-- Industry standard for Fabric Terraform validation
-- Enterprise compliance solution
-- Community-driven rule contributions
-- Fabric ecosystem integration
+- [ ] AI-assisted rule creation
+- [ ] Natural language rule queries
 
 ---
 
-## Feature Priority Matrix
+## Feature Requests & Priorities
 
-### High Priority (Current Focus)
-| Feature | Release | Status |
-|---------|---------|--------|
-| Core rules | v0.1.0 | ✅ Complete |
-| Documentation | v0.1.0 | ✅ Complete |
-| CI/CD | v0.1.0 | ✅ Complete |
-| Tagging rules | v0.2.0 | 🔄 Planned |
-| Presets | v0.2.0 | 🔄 Planned |
+### High Priority
+| Feature | Target Release | Status |
+|---------|---------------|--------|
+| Complete test coverage | v0.1.0 | 🔄 In Progress |
+| CI/CD pipeline | v0.1.0 | 🔄 In Progress |
+| Rule presets | v0.2.0 | 📋 Planned |
+| Configurable parameters | v0.2.0 | 📋 Planned |
 
 ### Medium Priority
-| Feature | Release | Status |
-|---------|---------|--------|
-| IDE integration | v0.3.0 | 📋 Planned |
-| Advanced rules | v0.3.0 | 📋 Planned |
-| OPA support | v0.4.0 | 📋 Planned |
-| Compliance reporting | v0.4.0 | 📋 Planned |
+| Feature | Target Release | Status |
+|---------|---------------|--------|
+| VS Code extension | v0.3.0 | 📋 Planned |
+| Custom rules | v0.3.0 | 📋 Planned |
+| Compliance reports | v0.4.0 | 📋 Planned |
+| Policy as Code | v0.4.0 | 📋 Planned |
 
-### Lower Priority (Future)
-| Feature | Release | Status |
-|---------|---------|--------|
-| Drift detection | v2.0.0+ | 💭 Considering |
-| ML integration | v2.0.0+ | 💭 Considering |
-| Portal integration | v2.0.0+ | 💭 Considering |
+### Community Requested
+| Feature | Votes | Status |
+|---------|-------|--------|
+| TBD | TBD | 💭 Gathering feedback |
 
 ---
 
-## Community Feedback
+## Contributing to the Roadmap
 
-We welcome community input on this roadmap! Please:
+We welcome community input! You can influence the roadmap by:
 
-1. **Vote on Features**: React to GitHub Issues with 👍/👎
-2. **Request Features**: Open GitHub Issues with your ideas
-3. **Contribute Code**: Submit PRs for planned features
-4. **Report Bugs**: Help us improve stability
+### 1. **GitHub Issues**
+Create feature requests with the `enhancement` label:
+```
+Title: [FEATURE] Request for <feature>
+Description: 
+- Use case
+- Expected behavior
+- Benefits
+```
+
+### 2. **GitHub Discussions**
+Participate in roadmap discussions:
+- Vote on features using 👍 reactions
+- Share your use cases
+- Propose new rules
+
+### 3. **Pull Requests**
+Contribute implementations:
+- Fork the repository
+- Implement your feature
+- Submit PR with tests and docs
+
+### 4. **Community Meetings**
+Join quarterly roadmap review sessions (TBD)
 
 ---
 
 ## Release Schedule
 
 ```
-2025 Releases:
-├─ v0.1.0 (October 2025) ✅ RELEASED
-├─ v0.2.0 (January 2025) 🔄 IN PLANNING
-├─ v0.3.0 (April 2025) 📋 PLANNED
-├─ v0.4.0 (July 2025) 📋 PLANNED
-└─ v1.0.0 (October 2025) 📋 PLANNED
-
 2026 Releases:
-├─ v1.1.0 (Q1 2026) 💭 CONSIDERING
-└─ v2.0.0 (Q3 2026) 💭 CONSIDERING
-```
+├─ v0.1.0 (January 2026)   - First stable release
+├─ v0.2.0 (April 2026)      - Enhanced rules & config
+├─ v0.3.0 (July 2026)       - Advanced features
+└─ v0.4.0 (October 2026)    - Enterprise features
 
----
-
-## How to Influence the Roadmap
-
-### 1. GitHub Issues
-Create an issue with the `enhancement` label:
+2027 Releases:
+├─ v0.5.0 (Q1 2027)         - TBD based on feedback
+├─ v0.6.0 (Q2 2027)         - TBD
+└─ v1.0.0 (Q4 2027)         - LTS Release
 ```
-Title: [ENHANCEMENT] Request: New rule for X
-Description: Use case and why it's needed
-```
-
-### 2. GitHub Discussions
-Discuss ideas in the Discussions tab:
-```
-Topic: What rules would help you most?
-Help us prioritize features
-```
-
-### 3. Pull Requests
-Contribute implementations:
-```
-Fork → Create branch → Submit PR
-Reference the roadmap item
-```
-
-### 4. Surveys & Feedback
-Participate in surveys and feedback sessions
 
 ---
 
 ## Support Lifecycle
 
-| Version | Release | End of Support | Status |
-|---------|---------|----------------|--------|
-| 0.1.x | Oct 2025 | Apr 2026 | Current |
-| 0.2.x | Jan 2025 | Jul 2025 | 🔄 Planned |
-| 0.3.x | Apr 2025 | Oct 2025 | 📋 Planned |
-| 0.4.x | Jul 2025 | Jan 2026 | 📋 Planned |
-| 1.0.x | Oct 2025 | Oct 2027 | 📋 Planned (LTS) |
+| Version | Release Date | End of Support | Status |
+|---------|-------------|----------------|--------|
+| 0.1.x | Jan 2026 | Jul 2026 | 📋 Planned |
+| 0.2.x | Apr 2026 | Oct 2026 | 📋 Planned |
+| 0.3.x | Jul 2026 | Jan 2027 | 📋 Planned |
+| 0.4.x | Oct 2026 | Apr 2027 | 📋 Planned |
+| 1.0.x | Q4 2027 | Q4 2029 | 📋 Planned (LTS) |
 
 ---
 
 ## Alignment with Fabric Evolution
 
-This roadmap is designed to evolve with Microsoft Fabric:
+This roadmap evolves with Microsoft Fabric:
 
-- 🔄 New Fabric resources → New rules
-- 📈 Fabric adoption growth → Enterprise features
-- 🔐 Security enhancements → Compliance rules
-- 💰 Cost optimization focus → Cost rules
-- 🌍 Multi-region support → Regional rules
+- 🆕 **New Fabric resources** → New validation rules
+- 📈 **Fabric adoption growth** → Enterprise features
+- 🔐 **Security enhancements** → Security rules
+- 💰 **Cost optimization** → Cost validation rules
+- 🌍 **Multi-region expansion** → Regional compliance
 
----
-
-## Feedback & Contributions
-
-We value your input! Please:
-
-1. **Review the roadmap** and provide feedback
-2. **Contribute code** for planned features
-3. **Report issues** you encounter
-4. **Suggest improvements** for existing rules
-
-**Get involved**: See [CONTRIBUTING.md](CONTRIBUTING.md)
+We monitor:
+- [Fabric Terraform Provider updates](https://github.com/microsoft/terraform-provider-fabric)
+- [Fabric release notes](https://learn.microsoft.com/en-us/fabric/release-plan/)
+- Community feedback
 
 ---
 
-**Last Updated**: October 2025
-**Next Review**: January 2025
+## Metrics & Goals
+
+### v0.1.0 Goals
+- ✅ 70+ rules implemented
+- 🔄 90%+ test coverage
+- 🔄 100% documented rules
+- 📋 10+ community stars
+- 📋 5+ contributors
+
+### v0.2.0 Goals
+- 📋 100+ rules
+- 📋 95%+ test coverage
+- 📋 50+ community stars
+- 📋 Rule presets
+- 📋 Configurable parameters
+
+### v1.0.0 Goals
+- 📋 150+ rules
+- 📋 99%+ test coverage
+- 📋 500+ community stars
+- 📋 50+ contributors
+- 📋 Enterprise adoption
+
+---
+
+## Get Involved
+
+We need your help to make this the best Fabric validation tool!
+
+**Ways to contribute:**
+- 🐛 Report bugs
+- 💡 Suggest features
+- 📝 Improve documentation
+- 🧪 Add test cases
+- 🔧 Implement rules
+- 📣 Spread the word
+
+**See**: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+**Last Updated**: January 2026  
+**Next Review**: April 2026
+
+**Status Legend:**
+- ✅ Complete
+- 🔄 In Progress
+- 📋 Planned
+- 💭 Under Consideration

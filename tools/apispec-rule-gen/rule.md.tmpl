@@ -1,0 +1,40 @@
+# {{ .RuleName }}
+
+Validates that the `{{ .AttributeName }}`{{ if .BlockType }} in `{{ .BlockType }}`{{ end }} attribute of `{{ .ResourceType }}` resources is valid according to the Fabric API specification.
+
+## Example
+
+```hcl
+resource "{{ .ResourceType }}" "example" {
+{{ if .BlockType }}  {{ .BlockType }} {
+{{ end }}{{ if .Enum }}    {{ .AttributeName }} = "{{ index .Enum 0 }}" # Valid
+{{ else if .Pattern }}    {{ .AttributeName }} = "valid-value" # Must match pattern: {{ .Pattern }}
+{{ else if .Format }}    {{ .AttributeName }} = "valid-{{ .Format }}" # Must be valid {{ .Format }}
+{{ else }}    {{ .AttributeName }} = "value"
+{{ end }}{{ if .BlockType }}  }
+{{ end }}}
+```
+
+## Validation Rules
+
+{{ if .Enum }}- Must be one of: {{ range $i, $v := .Enum }}{{ if $i }}, {{ end }}`{{ $v }}`{{ end }}
+{{ end }}{{ if .Pattern }}- Must match pattern: `{{ .Pattern }}`
+{{ end }}{{ if .Format }}- Must be a valid {{ .Format }} format
+{{ end }}{{ if .SetMaxLength }}- Maximum length: {{ .MaxLength }} characters
+{{ end }}{{ if .SetMinLength }}- Minimum length: {{ .MinLength }} characters
+{{ end }}{{ if .SetMax }}- Maximum value: {{ .Max }}
+{{ end }}{{ if .SetMin }}- Minimum value: {{ .Min }}
+{{ end }}{{ if .ReadOnly }}- This is a read-only property and should not be set
+{{ end }}
+
+## Why
+
+This rule ensures compliance with the Fabric REST API specification for `{{ .ResourceType }}`.
+
+## How To Fix
+
+Update the `{{ .AttributeName }}` attribute to conform to the validation rules above.
+
+## Reference
+
+- [Fabric API Spec]({{ .ReferenceURL }})

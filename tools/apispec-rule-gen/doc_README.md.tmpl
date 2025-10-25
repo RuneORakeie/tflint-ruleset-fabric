@@ -1,0 +1,7 @@
+# Generated Rules
+
+This directory contains auto-generated validation rules based on the Fabric REST API specifications.
+
+## Rules
+{{ range .RuleNameList }}
+- [{{ . }}](./rules/{{ . }}.md){{ end }}
