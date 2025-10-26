@@ -718,7 +718,7 @@ func TestFabricWorkspaceGitAzdoAttributes(t *testing.T) {
 		},
 	}
 	
-	rule := NewFabricWorkspaceGitAzdoAttributes()
+	rule := NewFabricWorkspaceGitAzureDevOpsAttributes()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			runner := helper.TestRunner(t, map[string]string{"main.tf": tt.content})
@@ -937,7 +937,7 @@ func TestFabricWorkspaceGitGithubAttributes(t *testing.T) {
 		},
 	}
 	
-	rule := NewFabricWorkspaceGitGithubAttributes()
+	rule := NewFabricWorkspaceGitGitHubAttributes()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			runner := helper.TestRunner(t, map[string]string{"main.tf": tt.content})
