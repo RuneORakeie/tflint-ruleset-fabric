@@ -164,7 +164,7 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 		}
 	}
 	fmt.Printf("DEBUG: Map contents after building: %v\n", resourcesWithRoles)
-	fmt.Printf("DEBUG: Map has 'fabric_workspace.example': %v\n", resourcesWithRoles["fabric_workspace.example"])
+	fmt.Printf("DEBUG: Map has '%s': %v\n", resourceRef, resourcesWithRoles[resourceRef])
 	// Check each resource
 	for _, block := range resources.Blocks {
 		// Get the resource reference (e.g., "fabric_workspace.example")
