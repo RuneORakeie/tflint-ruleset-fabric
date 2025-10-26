@@ -238,12 +238,12 @@ func TestFabricDeploymentPipelineStagesDescriptionLength(t *testing.T) {
 			hasIssue: false,
 		},
 		{
-			name: "valid - at max length (256)",
+			name: "valid - at max length (1024)",
 			content: `resource "fabric_deployment_pipeline" "example" {
 				display_name = "Test"
 				stages {
 					display_name = "dev"
-					description = "` + string(make([]byte, 256)) + `"
+					description = "` + string(make([]byte, 1024)) + `"
 					is_public = true
 				}
 				stages {
@@ -259,7 +259,7 @@ func TestFabricDeploymentPipelineStagesDescriptionLength(t *testing.T) {
 				display_name = "Test"
 				stages {
 					display_name = "dev"
-					description = "` + string(make([]byte, 257)) + `"
+					description = "` + string(make([]byte, 1025)) + `"
 					is_public = true
 				}
 				stages {
@@ -373,26 +373,26 @@ func TestFabricDomainContributorsScope(t *testing.T) {
 		hasIssue bool
 	}{
 		{
-			name: "valid - Workspace",
+			name: "valid - AdminsOnly",
 			content: `resource "fabric_domain" "example" {
 				display_name = "Test Domain"
-				contributors_scope = "Workspace"
+				contributors_scope = "AdminsOnly"
 			}`,
 			hasIssue: false,
 		},
 		{
-			name: "valid - DomainOnly",
+			name: "valid - AllTenant",
 			content: `resource "fabric_domain" "example" {
 				display_name = "Test Domain"
-				contributors_scope = "DomainOnly"
+				contributors_scope = "AllTenant"
 			}`,
 			hasIssue: false,
 		},
 		{
-			name: "valid - SpecificWorkspaces",
+			name: "valid - SpecificUsersAndGroups",
 			content: `resource "fabric_domain" "example" {
 				display_name = "Test Domain"
-				contributors_scope = "SpecificWorkspaces"
+				contributors_scope = "SpecificUsersAndGroups"
 			}`,
 			hasIssue: false,
 		},

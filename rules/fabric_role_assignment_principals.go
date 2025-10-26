@@ -3,6 +3,8 @@ package rules
 import (
 	"fmt"
 
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
@@ -33,6 +35,28 @@ func (r *FabricRoleAssignmentRecommended) Severity() tflint.Severity {
 
 func (r *FabricRoleAssignmentRecommended) Link() string {
 	return project.ReferenceLink(r.Name())
+}
+
+// extractResourceReference extracts "fabric_workspace.example" from expressions like:
+// - fabric_workspace.example.id
+// - fabric_workspace.example
+func extractResourceReference(expr hcl.Expression) string {
+	if traversal, ok := expr.(*hclsyntax.ScopeTraversalExpr); ok {
+		if len(traversal.Traversal) >= 2 {
+			// Traversal looks like: fabric_workspace.example.id
+			// Index 0: fabric_workspace (root)
+			// Index 1: example (resource label)
+			// Index 2: id (attribute) - optional
+			
+			rootName := traversal.Traversal.RootName() // "fabric_workspace"
+			
+			if attr, ok := traversal.Traversal[1].(hcl.TraverseAttr); ok {
+				// Return "fabric_workspace.example"
+				return fmt.Sprintf("%s.%s", rootName, attr.Name)
+			}
+		}
+	}
+	return ""
 }
 
 func (r *FabricRoleAssignmentRecommended) Check(runner tflint.Runner) error {
@@ -129,11 +153,12 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 	resourcesWithRoles := make(map[string]bool)
 	
 	for _, block := range roleAssignments.Blocks {
-		if attr, exists := block.Body.Attributes[config.referenceAttribute]; exists {
+		if attr, exists := block.Body.Attributes[config.referenceAttribute]; exists && attr.Expr != nil {
 			var resourceRef string
-			// Try to evaluate the expression to see if it references a resource
-			err := runner.EvaluateExpr(attr.Expr, &resourceRef, nil)
-			if err == nil {
+			// Extract resource reference from HCL expression
+			// This handles references like fabric_workspace.example.id
+			resourceRef := extractResourceReference(attr.Expr)
+			if resourceRef != "" {
 				resourcesWithRoles[resourceRef] = true
 			}
 		}

@@ -22,7 +22,7 @@ func (r *FabricCapacityRegion) Name() string {
 }
 
 func (r *FabricCapacityRegion) Enabled() bool {
-	return false // Disabled by default, enable if needed
+	return true // Disabled by default, enable if needed
 }
 
 func (r *FabricCapacityRegion) Severity() tflint.Severity {
