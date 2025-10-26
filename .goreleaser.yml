@@ -24,8 +24,7 @@ builds:
     binary: tflint-ruleset-fabric
 
 archives:
-  - format: zip
-    name_template: >-
+  - name_template: >-
       {{ .ProjectName }}_
       {{- .Version }}_
       {{- .Os }}_
@@ -43,31 +42,11 @@ signs:
 
 release:
   github:
-    owner: RuneORakie
+    owner: RuneORakeie
     name: tflint-ruleset-fabric
   prerelease: auto
   draft: false
   mode: replace
-  notes: |
-    ## TFLint Fabric Ruleset {{ .Version }}
-
-    ### New Features
-    {{ range .Commits.Group "features" }}
-    - {{ .Message }}
-    {{ end }}
-
-    ### Bug Fixes
-    {{ range .Commits.Group "fixes" }}
-    - {{ .Message }}
-    {{ end }}
-
-    ### Documentation
-    {{ range .Commits.Group "docs" }}
-    - {{ .Message }}
-    {{ end }}
-
-    See the [CHANGELOG](CHANGELOG.md) for full details.
-
   name_template: "v{{ .Version }}"
 
 changelog:

@@ -8,16 +8,6 @@ plugin "fabric" {
 }
 
 # ============================================
-# Fabric Workspace Naming Convention
-# ============================================
-rule "fabric_workspace_naming" {
-  enabled = true
-  
-  # Optional configuration for custom naming patterns
-  # pattern = "^[a-z0-9]{3,50}$"
-}
-
-# ============================================
 # Fabric Workspace Capacity Assignment
 # ============================================
 rule "fabric_workspace_capacity_required" {
@@ -25,16 +15,9 @@ rule "fabric_workspace_capacity_required" {
 }
 
 # ============================================
-# Fabric Workspace Description
+# Fabric Role Assignment Recommended
 # ============================================
-rule "fabric_workspace_description_required" {
-  enabled = true
-}
-
-# ============================================
-# Fabric Role Assignment Principal
-# ============================================
-rule "fabric_role_assignment_principal_required" {
+rule "fabric_role_assignment_recommended" {
   enabled = true
 }
 
@@ -44,14 +27,14 @@ rule "fabric_role_assignment_principal_required" {
 rule "fabric_git_integration_provider_valid" {
   enabled = true
   
-  # Supported providers: GitHub, Azure DevOps, Bitbucket Cloud, GitLab
+  # Supported providers: GitHub, Azure DevOps
 }
 
 # ============================================
 # Fabric Capacity Region Validation
 # ============================================
 rule "fabric_capacity_region_valid" {
-  enabled = false  # Disabled by default, enable if needed for region validation
+  enabled = true  
   
   # When enabled, validates regions against available Azure regions
 }
@@ -92,14 +75,11 @@ rule "terraform_standard_module_structure" {
 # Global TFLint Configuration
 # ============================================
 
-# Severity level for filtering results
-# Can be: error, warning, notice
-# minimum_failure_severity = "warning"
-
-# Format for output
-# Can be: default, json, checkstyle, junit, sarif
-format = "default"
-
-# Module Configuration - if using modules
-# module = true
-# deep_check = false
+# Module Configuration
+config {
+  # module = true              # Enable module inspection
+  # force = false              # Continue on errors
+  # disabled_by_default = false  # Enable all rules by default
+  
+  # Note: deep_check is deprecated and removed in newer TFLint versions
+}

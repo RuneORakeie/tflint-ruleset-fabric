@@ -59,3 +59,6 @@ dist/
 # General OS files
 .DS_Store
 Thumbs.db
+
+# Generated rules backup files
+.backup_*/

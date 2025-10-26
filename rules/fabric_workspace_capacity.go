@@ -1,12 +1,9 @@
 package rules
 
 import (
-	"fmt"
-	"regexp"
-
-	"github.com/terraform-linters/tflint-plugin-sdk/hcl"
-	"github.com/terraform-linters/tflint-plugin-sdk/logger"
+	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceCapacity ensures capacity is assigned to workspaces
@@ -26,28 +23,31 @@ func (r *FabricWorkspaceCapacity) Enabled() bool {
 	return true
 }
 
-func (r *FabricWorkspaceCapacity) Severity() string {
+func (r *FabricWorkspaceCapacity) Severity() tflint.Severity {
 	return tflint.ERROR
 }
 
 func (r *FabricWorkspaceCapacity) Link() string {
-	return "https://learn.microsoft.com/en-us/fabric/admin/capacity-settings"
+	return project.ReferenceLink(r.Name())
 }
 
 func (r *FabricWorkspaceCapacity) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourcesByType("fabric_workspace")
+	resourceContent, err := runner.GetResourceContent("fabric_workspace", &hclext.BodySchema{
+		Attributes: []hclext.AttributeSchema{
+			{Name: "capacity_id"},
+		},
+	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources {
-		var capacity string
-		err := resource.GetAttribute("capacity_id", &capacity)
-		if err != nil || capacity == "" {
+	// Iterate over all resource blocks
+	for _, resource := range resourceContent.Blocks {
+		if attr, exists := resource.Body.Attributes["capacity_id"]; !exists || attr.Expr == nil {
 			runner.EmitIssue(
 				r,
 				"Workspace should have a capacity assigned for production use",
-				resource.GetNameRange(),
+				resource.DefRange,
 			)
 		}
 	}

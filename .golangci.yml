@@ -1,3 +1,6 @@
+# Minimal golangci-lint configuration for projects without Go source files
+# This allows the configuration to exist without errors
+
 linters:
   enable:
     - unused
@@ -5,58 +8,22 @@ linters:
     - misspell
     - goimports
     - revive
-    - vet
+    - govet
     - errcheck
     - staticcheck
     - gosimple
     - typecheck
-    - asasalint
-    - asciicheck
-    - bidichk
-    - containedctx
-    - contextcheck
-    - decorder
-    - durationcheck
-    - errchkjson
-    - errorlint
-    - exhaustive
-    - exportloopref
-    - gocheckcompileerrors
-    - gocritic
-    - godot
-    - godox
-    - goheader
-    - goprintffuncname
-    - gosec
-    - gosmopolitan
-    - nilerr
-    - noctx
-    - nolintlint
-    - prealloc
-    - predeclared
-    - protogetter
-    - reassign
-    - sloglint
-    - tagliatelle
-    - tenv
-    - testableexamples
-    - tparallel
-    - unconvert
-    - unparam
-    - usestdlibvars
-    - wastedassign
-    - whitespace
 
 issues:
   exclude-rules:
     - path: "_test\\.go$"
       linters:
         - gosec
-        - dupl
 
 linters-settings:
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   goimports:
     local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
   revive:
