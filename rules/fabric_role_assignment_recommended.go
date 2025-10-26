@@ -157,14 +157,17 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 			// Extract resource reference from HCL expression
 			// This handles references like fabric_workspace.example.id
 			resourceRef := extractResourceReference(attr.Expr)
+
 			fmt.Printf("DEBUG: Extracted ref: %s from expr\n", resourceRef)
+			fmt.Printf("DEBUG: Checking resource: %s\n", resourceRef)
+			fmt.Printf("DEBUG: Map has '%s': %v\n", resourceRef, resourcesWithRoles[resourceRef])
+		
 			if resourceRef != "" {
 				resourcesWithRoles[resourceRef] = true
 			}
 		}
 	}
 	fmt.Printf("DEBUG: Map contents after building: %v\n", resourcesWithRoles)
-	fmt.Printf("DEBUG: Map has '%s': %v\n", resourceRef, resourcesWithRoles[resourceRef])
 	// Check each resource
 	for _, block := range resources.Blocks {
 		// Get the resource reference (e.g., "fabric_workspace.example")
