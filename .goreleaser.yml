@@ -36,8 +36,8 @@ checksum:
 
 signs:
   - cmd: gpg
-    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
-    artifacts: all
+    args: ["--batch", "--local-user", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+    artifacts: checksum
     stdin: "{{ .Env.GPG_PASSPHRASE }}"
 
 release:
