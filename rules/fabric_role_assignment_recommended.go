@@ -158,12 +158,9 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 			// This handles references like fabric_workspace.example.id
 			resourceRef := extractResourceReference(attr.Expr)
 
-			fmt.Printf("DEBUG: Extracted ref: %s from expr\n", resourceRef)
-			fmt.Printf("DEBUG: Checking resource: %s\n", resourceRef)
-			fmt.Printf("DEBUG: Map has '%s': %v\n", resourceRef, resourcesWithRoles[resourceRef])
-		
 			if resourceRef != "" {
 				resourcesWithRoles[resourceRef] = true
+				fmt.Printf("DEBUG: Added to map: %s\n", resourceRef)
 			}
 		}
 	}
@@ -172,6 +169,8 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 	for _, block := range resources.Blocks {
 		// Get the resource reference (e.g., "fabric_workspace.example")
 		resourceRef := fmt.Sprintf("%s.%s", config.resourceType, block.Labels[0])
+
+		fmt.Printf("DEBUG: NOW checking resource: %s, in map: %v\n", resourceRef, resourcesWithRoles[resourceRef])
 		
 		// If this resource doesn't have any role assignments, emit a warning
 		if !resourcesWithRoles[resourceRef] {
