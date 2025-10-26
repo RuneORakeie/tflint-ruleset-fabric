@@ -154,7 +154,6 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 	
 	for _, block := range roleAssignments.Blocks {
 		if attr, exists := block.Body.Attributes[config.referenceAttribute]; exists && attr.Expr != nil {
-			var resourceRef string
 			// Extract resource reference from HCL expression
 			// This handles references like fabric_workspace.example.id
 			resourceRef := extractResourceReference(attr.Expr)
