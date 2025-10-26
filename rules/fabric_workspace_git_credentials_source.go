@@ -2,13 +2,17 @@ package rules
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// FabricWorkspaceGitCredentialsSource validates git_credentials.source based on provider type
+// FabricWorkspaceGitCredentialsSource validates git_credentials.source values
+// Valid values depend on git_provider_type:
+// - GitHub: only "ConfiguredConnection"
+// - AzureDevOps: "ConfiguredConnection" or "Automatic"
 type FabricWorkspaceGitCredentialsSource struct {
 	tflint.DefaultRule
 }
@@ -18,7 +22,7 @@ func NewFabricWorkspaceGitCredentialsSource() *FabricWorkspaceGitCredentialsSour
 }
 
 func (r *FabricWorkspaceGitCredentialsSource) Name() string {
-	return "fabric_workspace_git_credentials_source_valid"
+	return "fabric_workspace_git_credentials_source"
 }
 
 func (r *FabricWorkspaceGitCredentialsSource) Enabled() bool {
@@ -59,36 +63,42 @@ func (r *FabricWorkspaceGitCredentialsSource) Check(runner tflint.Runner) error 
 	}
 
 	for _, resource := range resourceContent.Blocks {
+		// Get git_provider_type
 		var providerType string
-		
-		// Get provider type
-		gitProviderBlocks := resource.Body.Blocks.OfType("git_provider_details")
-		for _, block := range gitProviderBlocks {
-			if attr, exists := block.Body.Attributes["git_provider_type"]; exists && attr.Expr != nil {
-				runner.EvaluateExpr(attr.Expr, &providerType, nil)
+		providerBlocks := resource.Body.Blocks.OfType("git_provider_details")
+		if len(providerBlocks) > 0 {
+			if attr, exists := providerBlocks[0].Body.Attributes["git_provider_type"]; exists && attr.Expr != nil {
+				_ = runner.EvaluateExpr(attr.Expr, &providerType, nil)
 			}
 		}
-		
-		// Check credentials source
-		gitCredentialsBlocks := resource.Body.Blocks.OfType("git_credentials")
-		for _, block := range gitCredentialsBlocks {
-			if attr, exists := block.Body.Attributes["source"]; exists && attr.Expr != nil {
+
+		// Get git_credentials.source
+		credentialBlocks := resource.Body.Blocks.OfType("git_credentials")
+		if len(credentialBlocks) > 0 {
+			if attr, exists := credentialBlocks[0].Body.Attributes["source"]; exists && attr.Expr != nil {
 				var source string
 				if err := runner.EvaluateExpr(attr.Expr, &source, nil); err == nil && source != "" {
-					// GitHub only supports ConfiguredConnection
-					if providerType == "GitHub" && source != "ConfiguredConnection" {
-						runner.EmitIssue(
-							r,
-							fmt.Sprintf("GitHub only supports git_credentials.source = 'ConfiguredConnection' (current: '%s')", source),
-							attr.Range,
-						)
+					// Validate based on provider type
+					var validSources []string
+					var isValid bool
+
+					switch providerType {
+					case "GitHub":
+						validSources = []string{"ConfiguredConnection"}
+						isValid = source == "ConfiguredConnection"
+					case "AzureDevOps":
+						validSources = []string{"ConfiguredConnection", "Automatic"}
+						isValid = source == "ConfiguredConnection" || source == "Automatic"
+					default:
+						// Unknown provider type, skip validation
+						continue
 					}
-					
-					// AzureDevOps supports ConfiguredConnection or Automatic
-					if providerType == "AzureDevOps" && source != "ConfiguredConnection" && source != "Automatic" {
+
+					if !isValid {
 						runner.EmitIssue(
 							r,
-							fmt.Sprintf("Azure DevOps git_credentials.source must be 'ConfiguredConnection' or 'Automatic' (current: '%s')", source),
+							fmt.Sprintf("Invalid git_credentials.source '%s' for git_provider_type '%s'. Must be one of: %s",
+								source, providerType, strings.Join(validSources, ", ")),
 							attr.Range,
 						)
 					}

@@ -746,11 +746,13 @@ func TestFabricWorkspaceGitCredentialsSource(t *testing.T) {
 		hasIssue bool
 	}{
 		{
-			name: "valid - ServicePrincipal",
+			name: "valid - GitHub with ConfiguredConnection",
 			content: `resource "fabric_workspace_git" "example" {
 				workspace_id = "test"
 				initialization_strategy = "PreferWorkspace"
-				credentials_source = "ServicePrincipal"
+				git_credentials {
+					source = "ConfiguredConnection"
+				}
 				git_provider_details {
 					git_provider_type = "GitHub"
 					repository_name = "myrepo"
@@ -761,13 +763,36 @@ func TestFabricWorkspaceGitCredentialsSource(t *testing.T) {
 			hasIssue: false,
 		},
 		{
-			name: "valid - UserAuthentication",
+			name: "valid - AzureDevOps with Automatic",
 			content: `resource "fabric_workspace_git" "example" {
 				workspace_id = "test"
 				initialization_strategy = "PreferWorkspace"
-				credentials_source = "UserAuthentication"
+				git_credentials {
+					source = "Automatic"
+				}
 				git_provider_details {
-					git_provider_type = "GitHub"
+					git_provider_type = "AzureDevOps"
+					organization_name = "myorg"
+					project_name = "myproject"
+					repository_name = "myrepo"
+					branch_name = "main"
+					directory_name = "/test"
+				}
+			}`,
+			hasIssue: false,
+		},
+		{
+			name: "valid - AzureDevOps with ConfiguredConnection",
+			content: `resource "fabric_workspace_git" "example" {
+				workspace_id = "test"
+				initialization_strategy = "PreferWorkspace"
+				git_credentials {
+					source = "ConfiguredConnection"
+				}
+				git_provider_details {
+					git_provider_type = "AzureDevOps"
+					organization_name = "myorg"
+					project_name = "myproject"
 					repository_name = "myrepo"
 					branch_name = "main"
 					directory_name = "/test"
@@ -780,7 +805,26 @@ func TestFabricWorkspaceGitCredentialsSource(t *testing.T) {
 			content: `resource "fabric_workspace_git" "example" {
 				workspace_id = "test"
 				initialization_strategy = "PreferWorkspace"
-				credentials_source = "InvalidSource"
+				git_credentials {
+					source = "InvalidSource" 
+				}
+				git_provider_details {
+					git_provider_type = "GitHub"
+					repository_name = "myrepo"
+					branch_name = "main"
+					directory_name = "/test"
+				}
+			}`,
+			hasIssue: true,
+		},
+		{
+			name: "error - GitHub cannot use Automatic",
+			content: `resource "fabric_workspace_git" "example" {
+				workspace_id = "test"
+				initialization_strategy = "PreferWorkspace"
+				git_credentials {
+					source = "Automatic" 
+				}
 				git_provider_details {
 					git_provider_type = "GitHub"
 					repository_name = "myrepo"
