@@ -89,15 +89,17 @@ func (r *FabricCapacityRegion) Check(runner tflint.Runner) error {
 		"koreacentral":     true,
 	}
 
-	if attr, exists := resources.Attributes["region"]; exists && attr.Expr != nil {
-		var region string
-		if err := runner.EvaluateExpr(attr.Expr, &region, nil); err == nil && region != "" {
-			if !allWorkloadsRegions[region] {
-				runner.EmitIssue(
-					r,
-					fmt.Sprintf("Region '%s' may not support all Fabric workloads. Some features might be unavailable. Verify region availability at https://learn.microsoft.com/en-us/fabric/admin/region-availability", region),
-					attr.Range,
-				)
+	for _, resource := range resources.Blocks {
+		if attr, exists := resource.Body.Attributes["region"]; exists && attr.Expr != nil {
+			var region string
+			if err := runner.EvaluateExpr(attr.Expr, &region, nil); err == nil && region != "" {
+				if !allWorkloadsRegions[region] {
+					runner.EmitIssue(
+						r,
+						fmt.Sprintf("Region '%s' may not support all Fabric workloads. Some features might be unavailable. Verify region availability at https://learn.microsoft.com/en-us/fabric/admin/region-availability", region),
+						attr.Range,
+					)
+				}
 			}
 		}
 	}

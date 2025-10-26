@@ -1130,7 +1130,7 @@ func TestFabricWorkspaceGitStringLengths(t *testing.T) {
 				initialization_strategy = "PreferWorkspace"
 				git_provider_details {
 					git_provider_type = "GitHub"
-					repository_name = "` + string(make([]byte, 101)) + `"
+					repository_name = "` + string(make([]byte, 129)) + `"
 					branch_name = "main"
 					directory_name = "/test"
 				}

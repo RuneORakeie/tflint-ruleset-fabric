@@ -157,6 +157,7 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 			// Extract resource reference from HCL expression
 			// This handles references like fabric_workspace.example.id
 			resourceRef := extractResourceReference(attr.Expr)
+			fmt.Printf("DEBUG: Extracted ref: %s from expr\n", resourceRef)
 			if resourceRef != "" {
 				resourcesWithRoles[resourceRef] = true
 			}
