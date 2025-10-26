@@ -169,7 +169,7 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 	for _, block := range resources.Blocks {
 		fmt.Printf("DEBUG: block.Labels = %v\n", block.Labels)
 		// Get the resource reference (e.g., "fabric_workspace.example")
-		resourceRef := fmt.Sprintf("%s.%s", config.resourceType, block.Labels[0])
+		resourceRef := fmt.Sprintf("%s.%s", config.resourceType, block.Labels[1])
 
 		fmt.Printf("DEBUG: NOW checking resource: %s, in map: %v\n", resourceRef, resourcesWithRoles[resourceRef])
 		
