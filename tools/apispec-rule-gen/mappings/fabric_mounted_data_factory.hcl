@@ -6,10 +6,6 @@
 mapping "fabric_mounted_data_factory" {
   import_path = "mountedDataFactory/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
 
   // optional, max 256 chars
   attribute "description" {

@@ -6,10 +6,6 @@
 mapping "fabric_user_data_function" {
   import_path = "userDataFunction/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
 
   // optional, max 256 chars
   attribute "description" {

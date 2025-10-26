@@ -6,10 +6,7 @@
 mapping "fabric_eventhouse" {
   import_path = "eventhouse/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
+
 
   // optional, max 1024 chars
   attribute "description" {

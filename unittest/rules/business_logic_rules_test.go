@@ -48,7 +48,11 @@ func TestFabricCapacityRegion(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -193,7 +197,11 @@ func TestFabricDeploymentPipelineStagesCount(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -262,7 +270,11 @@ func TestFabricDeploymentPipelineStagesDescriptionLength(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -328,7 +340,11 @@ func TestFabricDeploymentPipelineStagesDisplayNameLength(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -381,7 +397,11 @@ func TestFabricDomainContributorsScope(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -434,7 +454,11 @@ func TestFabricItemDescriptionRecommended(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -500,7 +524,11 @@ resource "fabric_deployment_pipeline_role_assignment" "example" {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -536,7 +564,11 @@ func TestFabricWorkspaceCapacity(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -572,7 +604,11 @@ func TestFabricWorkspaceDescription(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -653,7 +689,11 @@ func TestFabricWorkspaceGitAzdoAttributes(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -719,7 +759,11 @@ func TestFabricWorkspaceGitCredentialsSource(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -782,7 +826,11 @@ func TestFabricWorkspaceGitDirectoryName(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -848,7 +896,11 @@ func TestFabricWorkspaceGitGithubAttributes(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -911,7 +963,11 @@ func TestFabricWorkspaceGitInitializationStrategy(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -976,7 +1032,11 @@ func TestFabricWorkspaceGitProviderType(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -1026,7 +1086,11 @@ func TestFabricWorkspaceGitStringLengths(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }
@@ -1097,7 +1161,11 @@ func TestFabricWorkspaceRoleAssignmentRole(t *testing.T) {
 			if err := rule.Check(runner); err != nil {
 				t.Fatalf("Unexpected error: %s", err)
 			}
-			helper.AssertIssues(t, tt.hasIssue, runner.Issues)
+			if tt.hasIssue {
+				helper.AssertIssuesCount(t, 1, runner.Issues)
+			} else {
+				helper.AssertIssuesCount(t, 0, runner.Issues)
+			}
 		})
 	}
 }

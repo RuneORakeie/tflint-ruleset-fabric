@@ -6,10 +6,7 @@
 mapping "fabric_eventstream" {
   import_path = "eventstream/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
+
 
   // optional, max 256 chars
   attribute "description" {

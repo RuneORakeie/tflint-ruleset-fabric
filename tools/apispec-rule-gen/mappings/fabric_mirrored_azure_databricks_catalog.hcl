@@ -6,11 +6,6 @@
 mapping "fabric_mirrored_azure_databricks_catalog" {
   import_path = "mirroredAzureDatabricksCatalog/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
-
   // optional, max 256 chars
   attribute "description" {
     api_ref = "CreateMirroredAzureDatabricksCatalogRequest.description"

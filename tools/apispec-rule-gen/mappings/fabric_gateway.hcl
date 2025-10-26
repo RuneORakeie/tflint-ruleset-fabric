@@ -12,10 +12,6 @@ mapping "fabric_gateway" {
     api_ref = "CreateVirtualNetworkGatewayRequest.capacityId"
   }
 
-  // optional
-  attribute "capacity_id_manual_manual" {
-    api_ref = "manual.capacity_id_manual"
-  }
 
   // optional
   attribute "capacity_id_virtual_network_gateway" {

@@ -6,11 +6,6 @@
 mapping "fabric_spark_job_definition" {
   import_path = "sparkjobdefinition/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
-
   // optional, max 1021 chars
   attribute "description" {
     api_ref = "CreateSparkJobDefinitionRequest.description"

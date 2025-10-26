@@ -16,11 +16,6 @@ mapping "fabric_domain" {
     api_ref = "UpdateDomainRequest.defaultLabelId"
   }
 
-  // optional
-  attribute "default_label_id_domain_manual" {
-    api_ref = "manual.default_label_id_domain"
-  }
-
   // optional, max 256 chars
   attribute "description" {
     api_ref = "CreateDomainRequest.description"

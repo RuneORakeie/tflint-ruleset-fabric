@@ -6,11 +6,6 @@
 mapping "fabric_dataflow" {
   import_path = "dataflow/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
-
   // optional, max 3988 chars
   attribute "description" {
     api_ref = "CreateDataflowRequest.description"

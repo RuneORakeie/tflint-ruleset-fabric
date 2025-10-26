@@ -6,10 +6,6 @@
 mapping "fabric_data_pipeline" {
   import_path = "dataPipeline/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
 
   // optional, max 1024 chars
   attribute "description" {

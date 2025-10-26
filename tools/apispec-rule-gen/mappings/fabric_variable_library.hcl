@@ -6,11 +6,6 @@
 mapping "fabric_variable_library" {
   import_path = "variableLibrary/definitions.json"
 
-  // optional
-  attribute "definition_manual_manual" {
-    api_ref = "manual.definition_manual"
-  }
-
   // optional, max 256 chars
   attribute "description" {
     api_ref = "CreateVariableLibraryRequest.description"
