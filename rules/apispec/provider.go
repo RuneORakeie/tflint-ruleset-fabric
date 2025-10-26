@@ -1,4 +1,4 @@
-package apispec
+package rules
 
 import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"

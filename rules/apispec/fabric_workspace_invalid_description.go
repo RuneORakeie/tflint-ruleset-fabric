@@ -1,4 +1,4 @@
-package apispec
+package rules
 
 import (
 	"fmt"
