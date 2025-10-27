@@ -9,7 +9,7 @@ install: build
 
 .PHONY: test
 test:
-	go test -v ./...
+	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 .PHONY: test-coverage
 test-coverage:
@@ -19,6 +19,10 @@ test-coverage:
 .PHONY: fmt
 fmt:
 	go fmt ./...
+
+.PHONY: e2e
+e2e:
+	cd integration && go test -v
 
 .PHONY: lint
 lint:

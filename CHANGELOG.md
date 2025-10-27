@@ -5,7 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [Unreleased]
+
+### Added
+- 68 rules total: 51 generated rules (from API spec) and 17 business logic rules
+- New rules for workspace Git integration:
+  - `fabric_workspace_git_initialization_strategy_valid`
+  - `fabric_workspace_git_directory_name_format`
+  - `fabric_workspace_git_credentials_source_valid`
+  - `fabric_workspace_git_connection_id_required`
+  - `fabric_workspace_git_azdo_attributes_required`
+  - `fabric_workspace_git_github_attributes_required`
+  - `fabric_workspace_git_string_lengths`
+- Expanded documentation for all new rules
+- Improved automation:
+  - Automatic updating of generated rules test file
+  - Automated business logic rule test generation
+- Test suite now covers all rules with table-driven tests
+- Refactored mapping generator for idempotency and correct manual attribute handling
+- Manual and automated cleanup of mapping files
+- Build and test automation improvements
+
+### Changed
+- Updated main.go to register all new rules
+- Improved test coverage and maintainability
 
 ### Planned
 - Additional permission validation rules
@@ -66,7 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ```bash
 # Install specific version
-tflint --init
+
 # Then specify version in .tflint.hcl
 plugin "fabric" {
   version = "0.1.0"

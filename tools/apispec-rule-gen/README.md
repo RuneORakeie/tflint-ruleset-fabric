@@ -87,7 +87,7 @@ Or from the `tools/apispec-rule-gen` directory:
 
 ```bash
 cd tools/apispec-rule-gen
-go run . -specs-path ../../../fabric-rest-api-specs -base-path . -rules-path ../../rules -docs-path ../../docs
+go run . -specs-path ../../../fabric-rest-api-specs -base-path . -rules-path ../../rules/apispec -docs-path ../../docs
 ```
 
 **Output**:
