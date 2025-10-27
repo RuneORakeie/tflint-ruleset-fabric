@@ -41,8 +41,8 @@ signs:
       - "--yes"
       - "--pinentry-mode"
       - "loopback"
-      - "--passphrase-fd"
-      - "0"
+      - "--passphrase"
+      - "{{ .Env.GPG_PASSPHRASE }}"
       - "--local-user"
       - "{{ .Env.GPG_FINGERPRINT }}"
       - "--output"
@@ -50,7 +50,6 @@ signs:
       - "--detach-sign"
       - "${artifact}"
     artifacts: checksum
-    stdin: "{{ .Env.GPG_PASSPHRASE }}"
 
 release:
   github:
