@@ -6,9 +6,9 @@ TFLint Ruleset for Fabric Terraform Provider - Development Roadmap
 
 ### ✅ Completed Features
 
-**70+ Validation Rules**
+**60+ Validation Rules**
 - ✅ 17 business logic rules for governance
-- ✅ 53 auto-generated API spec rules
+- ✅ 51 auto-generated API spec rules
 - ✅ Comprehensive test coverage (business logic rules)
 - ✅ Full documentation for all rules
 
@@ -19,7 +19,7 @@ TFLint Ruleset for Fabric Terraform Provider - Development Roadmap
 - ✅ Project structure and tooling
 
 **Documentation**
-- ✅ Individual rule documentation (70+ pages)
+- ✅ Individual rule documentation (60+ pages)
 - ✅ README with examples
 - ✅ Contributing guidelines
 - ✅ Code of conduct
@@ -89,7 +89,6 @@ TFLint Ruleset for Fabric Terraform Provider - Development Roadmap
 - [ ] `fabric_compliance_validation` - Compliance checks
 
 ### Tool Integration
-- [ ] VS Code extension
 - [ ] Pre-commit hooks
 - [ ] Terraform Cloud integration
 - [ ] Azure DevOps pipeline task
@@ -164,7 +163,6 @@ TFLint Ruleset for Fabric Terraform Provider - Development Roadmap
 ### Medium Priority
 | Feature | Target Release | Status |
 |---------|---------------|--------|
-| VS Code extension | v0.3.0 | 📋 Planned |
 | Custom rules | v0.3.0 | 📋 Planned |
 | Compliance reports | v0.4.0 | 📋 Planned |
 | Policy as Code | v0.4.0 | 📋 Planned |
