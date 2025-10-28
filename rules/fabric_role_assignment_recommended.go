@@ -107,14 +107,6 @@ func (r *FabricRoleAssignmentRecommended) Check(runner tflint.Runner) error {
 	return nil
 }
 
-type resourceConfig struct {
-	resourceType         string
-	roleAssignmentType   string
-	referenceAttribute   string
-	displayNameAttribute string
-	resourceTypeFriendly string
-}
-
 func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 	runner tflint.Runner,
 	config struct {

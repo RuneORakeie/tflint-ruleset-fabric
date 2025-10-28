@@ -94,11 +94,13 @@ func (r *FabricCapacityRegion) Check(runner tflint.Runner) error {
 			var region string
 			if err := runner.EvaluateExpr(attr.Expr, &region, nil); err == nil && region != "" {
 				if !allWorkloadsRegions[region] {
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						fmt.Sprintf("Region '%s' may not support all Fabric workloads. Some features might be unavailable. Verify region availability at https://learn.microsoft.com/en-us/fabric/admin/region-availability", region),
 						attr.Range,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}

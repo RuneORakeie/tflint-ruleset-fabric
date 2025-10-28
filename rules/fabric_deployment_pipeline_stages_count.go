@@ -54,17 +54,21 @@ func (r *FabricDeploymentPipelineStagesCount) Check(runner tflint.Runner) error 
 		stageCount := len(stagesBlocks)
 
 		if stageCount < minStages {
-			runner.EmitIssue(
+			if err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("Deployment pipeline must have at least %d stages (current: %d)", minStages, stageCount),
 				resource.DefRange,
-			)
+			); err != nil {
+				return err
+			}
 		} else if stageCount > maxStages {
-			runner.EmitIssue(
+			if err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("Deployment pipeline must not exceed %d stages (current: %d)", maxStages, stageCount),
 				resource.DefRange,
-			)
+			); err != nil {
+				return err
+			}
 		}
 	}
 

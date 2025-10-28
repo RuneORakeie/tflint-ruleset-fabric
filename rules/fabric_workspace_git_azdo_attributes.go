@@ -56,7 +56,7 @@ func (r *FabricWorkspaceGitAzureDevOpsAttributes) Check(runner tflint.Runner) er
 		for _, block := range gitProviderBlocks {
 			var providerType string
 			if attr, exists := block.Body.Attributes["git_provider_type"]; exists && attr.Expr != nil {
-				runner.EvaluateExpr(attr.Expr, &providerType, nil)
+				_ = runner.EvaluateExpr(attr.Expr, &providerType, nil)
 			}
 
 			// Only validate if provider is AzureDevOps

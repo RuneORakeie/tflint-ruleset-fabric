@@ -2,21 +2,57 @@
   "issues": [
     {
       "rule": {
+        "name": "fabric_item_description_recommended",
+        "severity": "warning",
+        "link": "https://github.com/RuneORakeie/tflint-ruleset-fabric/blob/v{{.Version}}/docs/rules/fabric_item_description_recommended.md"
+      },
+      "message": "Adding a description improves documentation and governance of your Fabric environment. Consider including the purpose, owner, and any relevant business context.",
+      "range": {
+        "filename": "main.tf",
+        "start": {"line": 1, "column": 1},
+        "end": {"line": 1, "column": 35}
+      },
+      "callers": []
+    },
+    {
+      "rule": {
+        "name": "fabric_role_assignment_recommended",
+        "severity": "warning",
+        "link": "https://github.com/RuneORakeie/tflint-ruleset-fabric/blob/v{{.Version}}/docs/rules/fabric_role_assignment_recommended.md"
+      },
+      "message": "Workspace 'test' (fabric_workspace) does not have any role assignments. This resource may not be accessible to users.",
+      "range": {
+        "filename": "main.tf",
+        "start": {"line": 1, "column": 1},
+        "end": {"line": 1, "column": 35}
+      },
+      "callers": []
+    },
+    {
+      "rule": {
         "name": "fabric_workspace_capacity_required",
         "severity": "error",
         "link": "https://github.com/RuneORakeie/tflint-ruleset-fabric/blob/v{{.Version}}/docs/rules/fabric_workspace_capacity_required.md"
       },
-      "message": "capacity_id is required for fabric_workspace",
+      "message": "Workspace should have a capacity assigned for production use",
       "range": {
         "filename": "main.tf",
-        "start": {
-          "line": 1,
-          "column": 1
-        },
-        "end": {
-          "line": 4,
-          "column": 2
-        }
+        "start": {"line": 1, "column": 1},
+        "end": {"line": 1, "column": 35}
+      },
+      "callers": []
+    },
+    {
+      "rule": {
+        "name": "fabric_workspace_description_required",
+        "severity": "warning",
+        "link": "https://github.com/RuneORakeie/tflint-ruleset-fabric/blob/v{{.Version}}/docs/rules/fabric_workspace_description_required.md"
+      },
+      "message": "Workspace should have a description for governance and documentation",
+      "range": {
+        "filename": "main.tf",
+        "start": {"line": 1, "column": 1},
+        "end": {"line": 1, "column": 35}
       },
       "callers": []
     }

@@ -404,7 +404,7 @@ func TestGeneratedRulesExecuteAll(t *testing.T) {
 
 	for ruleName, ruleInfo := range generatedRules {
 		rule := ruleInfo.Constructor()
-		ruleMethod := rule.(interface{ Check(tflint.Runner) error }).Check
+		ruleMethod := rule.Check
 
 		// Execute the rule
 		if err := ruleMethod(runner); err != nil {
@@ -495,10 +495,4 @@ func TestGeneratedRulesDiscoveryFromFilesystem(t *testing.T) {
 	}
 }
 
-// min returns the minimum of two integers
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+

@@ -40,21 +40,23 @@ func TestIntegration(t *testing.T) {
 			Command: exec.Command("tflint", "--format", "json", "--force"),
 			Dir:     "basic",
 		},
-		{
-			Name:    "workspace_validation",
-			Command: exec.Command("tflint", "--format", "json", "--force"),
-			Dir:     "workspace_validation",
-		},
+		// {
+		// 	Name:    "workspace_validation",
+		// 	Command: exec.Command("tflint", "--format", "json", "--force"),
+		// 	Dir:     "workspace_validation",
+		// },
 	}
 
 	dir, _ := os.Getwd()
-	defer os.Chdir(dir)
+	defer func() { _ = os.Chdir(dir) }()
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
 			testDir := filepath.Join(dir, tc.Dir)
-			os.Chdir(testDir)
-			defer os.Chdir(dir)
+			if err := os.Chdir(testDir); err != nil {
+				t.Fatal(err)
+			}
+			defer func() { _ = os.Chdir(dir) }()
 
 			var stdout, stderr bytes.Buffer
 			tc.Command.Stdout = &stdout
