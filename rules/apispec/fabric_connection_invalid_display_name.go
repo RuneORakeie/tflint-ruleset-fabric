@@ -2,10 +2,13 @@ package apispec
 
 import (
 	"fmt"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
+
 
 // FabricConnectionInvalidDisplayName checks whether fabric_connection.display_name is valid
 type FabricConnectionInvalidDisplayName struct {

@@ -2,10 +2,12 @@ package apispec
 
 import (
 	"fmt"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
+	"regexp"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"regexp"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricSparkJobDefinitionInvalidDisplayName checks whether fabric_spark_job_definition.display_name is valid

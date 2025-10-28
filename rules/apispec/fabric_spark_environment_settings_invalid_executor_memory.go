@@ -2,9 +2,11 @@ package apispec
 
 import (
 	"fmt"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricSparkEnvironmentSettingsInvalidExecutorMemory checks whether fabric_spark_environment_settings.executor_memory is valid

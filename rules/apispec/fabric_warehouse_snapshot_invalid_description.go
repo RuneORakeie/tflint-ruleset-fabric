@@ -2,9 +2,11 @@ package apispec
 
 import (
 	"fmt"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWarehouseSnapshotInvalidDescription checks whether fabric_warehouse_snapshot.description is valid

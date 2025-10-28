@@ -2,10 +2,13 @@ package apispec
 
 import (
 	"fmt"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
+
 
 // FabricDigitalTwinBuilderInvalidDescription checks whether fabric_digital_twin_builder.description is valid
 type FabricDigitalTwinBuilderInvalidDescription struct {

@@ -2,10 +2,13 @@ package apispec
 
 import (
 	"fmt"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
+
 
 // FabricLakehouseInvalidDescription checks whether fabric_lakehouse.description is valid
 type FabricLakehouseInvalidDescription struct {
