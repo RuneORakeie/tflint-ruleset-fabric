@@ -10,6 +10,6 @@ rule "fabric_workspace_description_required" {
   enabled = true
 }
 
-rule "fabric_workspace_naming" {
+rule "fabric_workspace_invalid_display_name" {
   enabled = true
 }
