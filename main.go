@@ -2,11 +2,12 @@
 package main
 
 import (
+	"github.com/terraform-linters/tflint-plugin-sdk/plugin"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/RuneORakeie/tflint-ruleset-fabric/rules"
 	"github.com/RuneORakeie/tflint-ruleset-fabric/rules/apispec"
-	"github.com/terraform-linters/tflint-plugin-sdk/plugin"
-	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 var (

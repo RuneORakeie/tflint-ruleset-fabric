@@ -3,9 +3,10 @@ package rules
 import (
 	"fmt"
 
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricDeploymentPipelineStagesCount checks that deployment pipelines have between 2 and 10 stages

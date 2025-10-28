@@ -60,11 +60,13 @@ func (r *FabricDeploymentPipelineStagesDescriptionLength) Check(runner tflint.Ru
 				var description string
 				if err := runner.EvaluateExpr(attr.Expr, &description, nil); err == nil && description != "" {
 					if len(description) > maxLength {
-						runner.EmitIssue(
+						if err := runner.EmitIssue(
 							r,
 							fmt.Sprintf("Stage description must not exceed %d characters (current: %d)", maxLength, len(description)),
 							attr.Range,
-						)
+						); err != nil {
+							return err
+						}
 					}
 				}
 			}

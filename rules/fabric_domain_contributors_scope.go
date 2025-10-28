@@ -56,11 +56,13 @@ func (r *FabricDomainContributorsScope) Check(runner tflint.Runner) error {
 			if err := runner.EvaluateExpr(attr.Expr, &scope, nil); err == nil && scope != "" {
 				if !validScopes[scope] {
 					validScopesList := []string{"AdminsOnly", "AllTenant", "SpecificUsersAndGroups"}
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						fmt.Sprintf("Invalid contributors_scope '%s'. Must be one of: %s", scope, strings.Join(validScopesList, ", ")),
 						attr.Range,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}
