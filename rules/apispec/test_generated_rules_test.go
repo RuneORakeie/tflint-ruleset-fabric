@@ -494,5 +494,3 @@ func TestGeneratedRulesDiscoveryFromFilesystem(t *testing.T) {
 		t.Logf("✓ All %d filesystem rules are registered", len(ruleNames))
 	}
 }
-
-
