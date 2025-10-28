@@ -50,7 +50,7 @@ func (r *FabricWorkspaceDescription) Check(runner tflint.Runner) error {
 				"Workspace should have a description for governance and documentation",
 				resource.DefRange,
 			); err != nil {
-						return err
+				return err
 			}
 		}
 	}

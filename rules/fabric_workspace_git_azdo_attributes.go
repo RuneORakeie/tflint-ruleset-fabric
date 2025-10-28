@@ -70,7 +70,7 @@ func (r *FabricWorkspaceGitAzureDevOpsAttributes) Check(runner tflint.Runner) er
 						block.DefRange,
 					); err != nil {
 						return err
-				}
+					}
 				}
 
 				// Check project_name

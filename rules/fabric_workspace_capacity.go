@@ -50,7 +50,7 @@ func (r *FabricWorkspaceCapacity) Check(runner tflint.Runner) error {
 				"Workspace should have a capacity assigned for production use",
 				resource.DefRange,
 			); err != nil {
-						return err
+				return err
 			}
 		}
 	}
