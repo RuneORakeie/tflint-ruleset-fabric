@@ -4,8 +4,8 @@ build:
 
 .PHONY: install
 install: build
-	mkdir -p ~/.tflint.d/plugins
-	cp ./tflint-ruleset-fabric ~/.tflint.d/plugins/  # Changed from mv to cp
+	@mkdir -p ~/.tflint.d/plugins
+	@cp ./tflint-ruleset-fabric ~/.tflint.d/plugins/tflint-ruleset-fabric
 
 .PHONY: test
 test:
