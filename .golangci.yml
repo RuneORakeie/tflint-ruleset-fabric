@@ -20,7 +20,11 @@ linters:
       rules:
         - name: unused-parameter
           disabled: true
-
+  exclusions:
+    rules:
+      - path: "_test\\.go$"
+        linters:
+          - gosec
 formatters:
   enable:
     - goimports
@@ -28,9 +32,4 @@ formatters:
     goimports:
       local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
 
-linters:
-  exclusions:
-    rules:
-      - path: "_test\\.go$"
-        linters:
-          - gosec
+
