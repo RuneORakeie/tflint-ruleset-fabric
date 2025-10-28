@@ -3,9 +3,9 @@ package rules
 import (
 	"fmt"
 
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitProviderType validates Git provider type
@@ -57,7 +57,7 @@ func (r *FabricWorkspaceGitProviderType) Check(runner tflint.Runner) error {
 
 	for _, resource := range resourceContent.Blocks {
 		gitProviderBlocks := resource.Body.Blocks.OfType("git_provider_details")
-		
+
 		for _, block := range gitProviderBlocks {
 			if attr, exists := block.Body.Attributes["git_provider_type"]; exists && attr.Expr != nil {
 				var provider string

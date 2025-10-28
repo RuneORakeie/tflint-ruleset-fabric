@@ -2,9 +2,9 @@ package apispec
 
 import (
 	"fmt"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricConnectionInvalidConnectivityType checks whether fabric_connection.connectivity_type is valid
@@ -14,14 +14,6 @@ type FabricConnectionInvalidConnectivityType struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +21,7 @@ func NewFabricConnectionInvalidConnectivityType() *FabricConnectionInvalidConnec
 	return &FabricConnectionInvalidConnectivityType{
 		resourceType:  "fabric_connection",
 		attributeName: "connectivity_type",
-		enum:          []string{ "ShareableCloud", "VirtualNetworkGateway",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"ShareableCloud", "VirtualNetworkGateway"},
 	}
 }
 
@@ -78,7 +62,6 @@ func (r *FabricConnectionInvalidConnectivityType) Check(runner tflint.Runner) er
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +71,6 @@ func (r *FabricConnectionInvalidConnectivityType) Check(runner tflint.Runner) er
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +89,3 @@ func (r *FabricConnectionInvalidConnectivityType) validateEnum(runner tflint.Run
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

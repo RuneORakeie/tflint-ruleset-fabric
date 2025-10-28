@@ -2,9 +2,9 @@ package apispec
 
 import (
 	"fmt"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricSparkEnvironmentSettingsInvalidExecutorMemory checks whether fabric_spark_environment_settings.executor_memory is valid
@@ -14,14 +14,6 @@ type FabricSparkEnvironmentSettingsInvalidExecutorMemory struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +21,7 @@ func NewFabricSparkEnvironmentSettingsInvalidExecutorMemory() *FabricSparkEnviro
 	return &FabricSparkEnvironmentSettingsInvalidExecutorMemory{
 		resourceType:  "fabric_spark_environment_settings",
 		attributeName: "executor_memory",
-		enum:          []string{ "28g", "56g", "112g", "224g", "400g",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"28g", "56g", "112g", "224g", "400g"},
 	}
 }
 
@@ -78,7 +62,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorMemory) Check(runner tflin
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +71,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorMemory) Check(runner tflin
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +89,3 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorMemory) validateEnum(runne
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

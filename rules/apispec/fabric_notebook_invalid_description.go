@@ -2,9 +2,9 @@ package apispec
 
 import (
 	"fmt"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricNotebookInvalidDescription checks whether fabric_notebook.description is valid
@@ -14,14 +14,7 @@ type FabricNotebookInvalidDescription struct {
 	resourceType  string
 	attributeName string
 
-
-
-
-
-	maxLength     int
-
-
-
+	maxLength int
 }
 
 // NewFabricRule returns a new rule instance
@@ -30,14 +23,7 @@ func NewFabricNotebookInvalidDescription() *FabricNotebookInvalidDescription {
 		resourceType:  "fabric_notebook",
 		attributeName: "description",
 
-
-
-
-
-		maxLength:     1021,
-
-
-
+		maxLength: 1021,
 	}
 }
 
@@ -78,15 +64,11 @@ func (r *FabricNotebookInvalidDescription) Check(runner tflint.Runner) error {
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
 			return err
 		}
-
-
-
 
 		if len(val) > r.maxLength {
 			return runner.EmitIssue(
@@ -96,13 +78,7 @@ func (r *FabricNotebookInvalidDescription) Check(runner tflint.Runner) error {
 			)
 		}
 
-
-
 	}
 
 	return nil
 }
-
-
-
-

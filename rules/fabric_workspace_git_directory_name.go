@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitDirectoryName validates directory_name format and length
@@ -55,7 +55,7 @@ func (r *FabricWorkspaceGitDirectoryName) Check(runner tflint.Runner) error {
 
 	for _, resource := range resourceContent.Blocks {
 		gitProviderBlocks := resource.Body.Blocks.OfType("git_provider_details")
-		
+
 		for _, block := range gitProviderBlocks {
 			if attr, exists := block.Body.Attributes["directory_name"]; exists && attr.Expr != nil {
 				var directoryName string
@@ -68,7 +68,7 @@ func (r *FabricWorkspaceGitDirectoryName) Check(runner tflint.Runner) error {
 							attr.Range,
 						)
 					}
-					
+
 					// Check length
 					if len(directoryName) > maxLength {
 						runner.EmitIssue(

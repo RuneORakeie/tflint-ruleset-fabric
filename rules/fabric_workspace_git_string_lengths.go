@@ -3,9 +3,9 @@ package rules
 import (
 	"fmt"
 
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitStringLengths validates string length constraints for git_provider_details attributes
@@ -65,7 +65,7 @@ func (r *FabricWorkspaceGitStringLengths) Check(runner tflint.Runner) error {
 
 	for _, resource := range resourceContent.Blocks {
 		gitProviderBlocks := resource.Body.Blocks.OfType("git_provider_details")
-		
+
 		for _, block := range gitProviderBlocks {
 			// Check each attribute
 			for attrName, maxLength := range maxLengths {

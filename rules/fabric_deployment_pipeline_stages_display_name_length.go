@@ -3,9 +3,9 @@ package rules
 import (
 	"fmt"
 
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricDeploymentPipelineStagesDisplayNameLength checks stage display names don't exceed 256 chars
@@ -54,7 +54,7 @@ func (r *FabricDeploymentPipelineStagesDisplayNameLength) Check(runner tflint.Ru
 
 	for _, resource := range resourceContent.Blocks {
 		stagesBlocks := resource.Body.Blocks.OfType("stages")
-		
+
 		for _, stage := range stagesBlocks {
 			if attr, exists := stage.Body.Attributes["display_name"]; exists && attr.Expr != nil {
 				var name string

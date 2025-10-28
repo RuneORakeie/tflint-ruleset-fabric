@@ -2,9 +2,9 @@ package apispec
 
 import (
 	"fmt"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricConnectionInvalidPrivacyLevel checks whether fabric_connection.privacy_level is valid
@@ -14,14 +14,6 @@ type FabricConnectionInvalidPrivacyLevel struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +21,7 @@ func NewFabricConnectionInvalidPrivacyLevel() *FabricConnectionInvalidPrivacyLev
 	return &FabricConnectionInvalidPrivacyLevel{
 		resourceType:  "fabric_connection",
 		attributeName: "privacy_level",
-		enum:          []string{ "None", "Private", "Organizational", "Public",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"None", "Private", "Organizational", "Public"},
 	}
 }
 
@@ -78,7 +62,6 @@ func (r *FabricConnectionInvalidPrivacyLevel) Check(runner tflint.Runner) error 
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +71,6 @@ func (r *FabricConnectionInvalidPrivacyLevel) Check(runner tflint.Runner) error 
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +89,3 @@ func (r *FabricConnectionInvalidPrivacyLevel) validateEnum(runner tflint.Runner,
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

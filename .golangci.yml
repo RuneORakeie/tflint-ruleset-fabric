@@ -1,33 +1,36 @@
-# Minimal golangci-lint configuration for projects without Go source files
-# This allows the configuration to exist without errors
+version: 2
 
 linters:
   enable:
     - unused
     - ineffassign
     - misspell
-    - goimports
     - revive
     - govet
     - errcheck
     - staticcheck
     - gosimple
     - typecheck
+  settings:
+    govet:
+      enable:
+        - shadow
+    revive:
+      severity: warning
+      rules:
+        - name: unused-parameter
+          disabled: true
 
-issues:
-  exclude-rules:
-    - path: "_test\\.go$"
-      linters:
-        - gosec
+formatters:
+  enable:
+    - goimports
+  settings:
+    goimports:
+      local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
 
-linters-settings:
-  govet:
-    enable:
-      - shadow
-  goimports:
-    local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
-  revive:
-    severity: warning
+linters:
+  exclusions:
     rules:
-      - name: unused-parameter
-        disabled: true
+      - path: "_test\\.go$"
+        linters:
+          - gosec

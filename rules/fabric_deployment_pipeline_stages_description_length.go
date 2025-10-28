@@ -3,9 +3,9 @@ package rules
 import (
 	"fmt"
 
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricDeploymentPipelineStagesDescriptionLength checks stage descriptions don't exceed 1024 chars
@@ -54,7 +54,7 @@ func (r *FabricDeploymentPipelineStagesDescriptionLength) Check(runner tflint.Ru
 
 	for _, resource := range resourceContent.Blocks {
 		stagesBlocks := resource.Body.Blocks.OfType("stages")
-		
+
 		for _, stage := range stagesBlocks {
 			if attr, exists := stage.Body.Attributes["description"]; exists && attr.Expr != nil {
 				var description string

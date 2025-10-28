@@ -1,8 +1,8 @@
 package rules
 
 import (
-	"testing"
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"testing"
 )
 
 // TestFabricCapacityRegion tests region validation rule
@@ -40,7 +40,7 @@ func TestFabricCapacityRegion(t *testing.T) {
 			hasIssue: false,
 		},
 	}
-	
+
 	rule := NewFabricCapacityRegion()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestFabricCapacityRegion(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -193,7 +193,7 @@ func TestFabricDeploymentPipelineStagesCount(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricDeploymentPipelineStagesCount()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -209,7 +209,7 @@ func TestFabricDeploymentPipelineStagesCount(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -270,7 +270,7 @@ func TestFabricDeploymentPipelineStagesDescriptionLength(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricDeploymentPipelineStagesDescriptionLength()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -286,7 +286,7 @@ func TestFabricDeploymentPipelineStagesDescriptionLength(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -344,7 +344,7 @@ func TestFabricDeploymentPipelineStagesDisplayNameLength(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricDeploymentPipelineStagesDisplayNameLength()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -360,7 +360,7 @@ func TestFabricDeploymentPipelineStagesDisplayNameLength(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -405,7 +405,7 @@ func TestFabricDomainContributorsScope(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricDomainContributorsScope()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -421,7 +421,7 @@ func TestFabricDomainContributorsScope(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -466,7 +466,7 @@ func TestFabricItemDescriptionRecommended(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricItemDescriptionRecommended()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -482,7 +482,7 @@ func TestFabricItemDescriptionRecommended(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -540,7 +540,7 @@ resource "fabric_deployment_pipeline_role_assignment" "example" {
 			hasIssue: false,
 		},
 	}
-	
+
 	rule := NewFabricRoleAssignmentRecommended()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -556,7 +556,7 @@ resource "fabric_deployment_pipeline_role_assignment" "example" {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -584,7 +584,7 @@ func TestFabricWorkspaceCapacity(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceCapacity()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -600,7 +600,7 @@ func TestFabricWorkspaceCapacity(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -628,7 +628,7 @@ func TestFabricWorkspaceDescription(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceDescription()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -644,7 +644,7 @@ func TestFabricWorkspaceDescription(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -717,7 +717,7 @@ func TestFabricWorkspaceGitAzdoAttributes(t *testing.T) {
 			hasIssue: false,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceGitAzureDevOpsAttributes()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -733,7 +733,7 @@ func TestFabricWorkspaceGitAzdoAttributes(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -835,7 +835,7 @@ func TestFabricWorkspaceGitCredentialsSource(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceGitCredentialsSource()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -851,7 +851,7 @@ func TestFabricWorkspaceGitCredentialsSource(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -906,7 +906,7 @@ func TestFabricWorkspaceGitDirectoryName(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceGitDirectoryName()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -922,7 +922,7 @@ func TestFabricWorkspaceGitDirectoryName(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -980,7 +980,7 @@ func TestFabricWorkspaceGitGithubAttributes(t *testing.T) {
 			hasIssue: false,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceGitGitHubAttributes()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -996,7 +996,7 @@ func TestFabricWorkspaceGitGithubAttributes(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -1051,7 +1051,7 @@ func TestFabricWorkspaceGitInitializationStrategy(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceGitInitializationStrategy()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1067,7 +1067,7 @@ func TestFabricWorkspaceGitInitializationStrategy(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -1124,7 +1124,7 @@ func TestFabricWorkspaceGitProviderType(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceGitProviderType()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1140,7 +1140,7 @@ func TestFabricWorkspaceGitProviderType(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -1182,7 +1182,7 @@ func TestFabricWorkspaceGitStringLengths(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceGitStringLengths()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1198,7 +1198,7 @@ func TestFabricWorkspaceGitStringLengths(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }
@@ -1261,7 +1261,7 @@ func TestFabricWorkspaceRoleAssignmentRole(t *testing.T) {
 			hasIssue: true,
 		},
 	}
-	
+
 	rule := NewFabricWorkspaceRoleAssignmentRole()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1277,7 +1277,7 @@ func TestFabricWorkspaceRoleAssignmentRole(t *testing.T) {
 				if tt.hasIssue {
 					t.Fatal("Expected issues, but got none")
 				}
-			}		
+			}
 		})
 	}
 }

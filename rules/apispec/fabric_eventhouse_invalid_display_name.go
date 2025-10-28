@@ -2,10 +2,10 @@ package apispec
 
 import (
 	"fmt"
-	"regexp"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
+	"regexp"
 )
 
 // FabricEventhouseInvalidDisplayName checks whether fabric_eventhouse.display_name is valid
@@ -15,14 +15,9 @@ type FabricEventhouseInvalidDisplayName struct {
 	resourceType  string
 	attributeName string
 
-	pattern       string
+	pattern string
 
-
-
-	maxLength     int
-
-
-
+	maxLength int
 }
 
 // NewFabricRule returns a new rule instance
@@ -31,14 +26,9 @@ func NewFabricEventhouseInvalidDisplayName() *FabricEventhouseInvalidDisplayName
 		resourceType:  "fabric_eventhouse",
 		attributeName: "display_name",
 
-		pattern:       `^[a-zA-Z0-9._-]+$`,
+		pattern: `^[a-zA-Z0-9._-]+$`,
 
-
-
-		maxLength:     256,
-
-
-
+		maxLength: 256,
 	}
 }
 
@@ -79,18 +69,15 @@ func (r *FabricEventhouseInvalidDisplayName) Check(runner tflint.Runner) error {
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
 			return err
 		}
 
-
 		if err := r.validatePattern(runner, val, attribute); err != nil {
 			return err
 		}
-
 
 		if len(val) > r.maxLength {
 			return runner.EmitIssue(
@@ -100,13 +87,10 @@ func (r *FabricEventhouseInvalidDisplayName) Check(runner tflint.Runner) error {
 			)
 		}
 
-
-
 	}
 
 	return nil
 }
-
 
 func (r *FabricEventhouseInvalidDisplayName) validatePattern(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
 	matched, err := regexp.MatchString(r.pattern, val)
@@ -122,6 +106,3 @@ func (r *FabricEventhouseInvalidDisplayName) validatePattern(runner tflint.Runne
 	}
 	return nil
 }
-
-
-

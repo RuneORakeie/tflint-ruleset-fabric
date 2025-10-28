@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricDomainContributorsScope validates domain contributors_scope values
@@ -45,9 +45,9 @@ func (r *FabricDomainContributorsScope) Check(runner tflint.Runner) error {
 	}
 
 	validScopes := map[string]bool{
-		"AdminsOnly":              true,
-		"AllTenant":               true,
-		"SpecificUsersAndGroups":  true,
+		"AdminsOnly":             true,
+		"AllTenant":              true,
+		"SpecificUsersAndGroups": true,
 	}
 
 	for _, resource := range resourceContent.Blocks {

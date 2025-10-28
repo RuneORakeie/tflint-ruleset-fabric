@@ -26,17 +26,10 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Install TFLint (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl -sL https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-        env:
-          TFLINT_VERSION: ${{ matrix.tflint-version }}
-
-      - name: Install TFLint (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          choco install tflint --version ${{ matrix.tflint-version }}
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: ${{ matrix.tflint-version }}          
 
       - name: Install plugin
         run: make install

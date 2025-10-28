@@ -9,20 +9,20 @@ install: build
 
 .PHONY: test
 test:
-	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+	go test -v -race -coverprofile=coverage.txt -covermode=atomic $(shell go list ./... | grep -v /integration)
 
 .PHONY: test-coverage
 test-coverage:
-	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+	go test -v -race -coverprofile=coverage.txt -covermode=atomic $(shell go list ./... | grep -v /integration)
 	go tool cover -html=coverage.txt -o coverage.html
-
-.PHONY: fmt
-fmt:
-	go fmt ./...
 
 .PHONY: e2e
 e2e:
 	cd integration && go test -v
+
+.PHONY: fmt
+fmt:
+	go fmt ./...
 
 .PHONY: lint
 lint:

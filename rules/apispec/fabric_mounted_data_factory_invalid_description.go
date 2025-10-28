@@ -2,9 +2,9 @@ package apispec
 
 import (
 	"fmt"
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricMountedDataFactoryInvalidDescription checks whether fabric_mounted_data_factory.description is valid
@@ -14,14 +14,7 @@ type FabricMountedDataFactoryInvalidDescription struct {
 	resourceType  string
 	attributeName string
 
-
-
-
-
-	maxLength     int
-
-
-
+	maxLength int
 }
 
 // NewFabricRule returns a new rule instance
@@ -30,14 +23,7 @@ func NewFabricMountedDataFactoryInvalidDescription() *FabricMountedDataFactoryIn
 		resourceType:  "fabric_mounted_data_factory",
 		attributeName: "description",
 
-
-
-
-
-		maxLength:     256,
-
-
-
+		maxLength: 256,
 	}
 }
 
@@ -78,15 +64,11 @@ func (r *FabricMountedDataFactoryInvalidDescription) Check(runner tflint.Runner)
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
 			return err
 		}
-
-
-
 
 		if len(val) > r.maxLength {
 			return runner.EmitIssue(
@@ -96,13 +78,7 @@ func (r *FabricMountedDataFactoryInvalidDescription) Check(runner tflint.Runner)
 			)
 		}
 
-
-
 	}
 
 	return nil
 }
-
-
-
-
