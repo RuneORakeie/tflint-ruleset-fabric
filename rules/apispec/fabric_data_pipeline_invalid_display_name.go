@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricDataPipelineInvalidDisplayName checks whether fabric_data_pipeline.display_name is valid
 type FabricDataPipelineInvalidDisplayName struct {
 	tflint.DefaultRule

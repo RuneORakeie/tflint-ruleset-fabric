@@ -10,7 +10,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricEventstreamInvalidDisplayName checks whether fabric_eventstream.display_name is valid
 type FabricEventstreamInvalidDisplayName struct {
 	tflint.DefaultRule

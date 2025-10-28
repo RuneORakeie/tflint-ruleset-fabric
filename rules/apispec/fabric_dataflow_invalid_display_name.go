@@ -10,7 +10,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricDataflowInvalidDisplayName checks whether fabric_dataflow.display_name is valid
 type FabricDataflowInvalidDisplayName struct {
 	tflint.DefaultRule

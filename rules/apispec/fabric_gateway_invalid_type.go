@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricGatewayInvalidType checks whether fabric_gateway.type is valid
 type FabricGatewayInvalidType struct {
 	tflint.DefaultRule

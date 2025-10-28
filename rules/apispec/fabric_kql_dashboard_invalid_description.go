@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricKQLDashboardInvalidDescription checks whether fabric_kql_dashboard.description is valid
 type FabricKQLDashboardInvalidDescription struct {
 	tflint.DefaultRule

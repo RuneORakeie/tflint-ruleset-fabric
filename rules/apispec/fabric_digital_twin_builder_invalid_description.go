@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricDigitalTwinBuilderInvalidDescription checks whether fabric_digital_twin_builder.description is valid
 type FabricDigitalTwinBuilderInvalidDescription struct {
 	tflint.DefaultRule

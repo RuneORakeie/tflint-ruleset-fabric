@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricGatewayInvalidDisplayName checks whether fabric_gateway.display_name is valid
 type FabricGatewayInvalidDisplayName struct {
 	tflint.DefaultRule

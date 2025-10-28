@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricLakehouseInvalidDisplayName checks whether fabric_lakehouse.display_name is valid
 type FabricLakehouseInvalidDisplayName struct {
 	tflint.DefaultRule

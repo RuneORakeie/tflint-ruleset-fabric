@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricDeploymentPipelineInvalidDescription checks whether fabric_deployment_pipeline.description is valid
 type FabricDeploymentPipelineInvalidDescription struct {
 	tflint.DefaultRule

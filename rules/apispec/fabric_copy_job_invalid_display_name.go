@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricCopyJobInvalidDisplayName checks whether fabric_copy_job.display_name is valid
 type FabricCopyJobInvalidDisplayName struct {
 	tflint.DefaultRule

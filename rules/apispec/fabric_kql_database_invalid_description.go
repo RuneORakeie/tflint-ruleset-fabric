@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricKQLDatabaseInvalidDescription checks whether fabric_kql_database.description is valid
 type FabricKQLDatabaseInvalidDescription struct {
 	tflint.DefaultRule

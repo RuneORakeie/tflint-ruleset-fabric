@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricKQLQuerysetInvalidDescription checks whether fabric_kql_queryset.description is valid
 type FabricKQLQuerysetInvalidDescription struct {
 	tflint.DefaultRule

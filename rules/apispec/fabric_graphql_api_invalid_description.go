@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricGraphqlAPIInvalidDescription checks whether fabric_graphql_api.description is valid
 type FabricGraphqlAPIInvalidDescription struct {
 	tflint.DefaultRule

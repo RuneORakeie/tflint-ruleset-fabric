@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricGatewayInvalidInactivityMinutesBeforeSleep checks whether fabric_gateway.inactivity_minutes_before_sleep is valid
 type FabricGatewayInvalidInactivityMinutesBeforeSleep struct {
 	tflint.DefaultRule

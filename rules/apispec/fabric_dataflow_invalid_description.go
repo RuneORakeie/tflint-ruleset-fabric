@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricDataflowInvalidDescription checks whether fabric_dataflow.description is valid
 type FabricDataflowInvalidDescription struct {
 	tflint.DefaultRule

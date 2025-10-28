@@ -1,12 +1,13 @@
+//go:build ignore
 // +build ignore
 
 package main
 
 import (
 	"fmt"
+	"go/ast"
 	"go/parser"
 	"go/token"
-	"go/ast"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -64,44 +65,44 @@ func main() {
 
 	fmt.Printf("Found %d generated rules\n", len(rules))
 
-       // Read the generated_rules_test.go file
-       testFile := "rules/generated_rules_test.go"
-       testContent, err := ioutil.ReadFile(testFile)
-       if err != nil {
-	       fmt.Fprintf(os.Stderr, "Error reading test file: %v\n", err)
-	       os.Exit(1)
-       }
-       // Find the start and end of the generatedRuleConstructors block
-       startMarker := "generatedRuleConstructors := []GeneratedRuleInfo{"
-       endMarker := "// End generated rules list"
-       startIdx := strings.Index(string(testContent), startMarker)
-       endIdx := strings.Index(string(testContent), endMarker)
-       if startIdx == -1 || endIdx == -1 {
-	       fmt.Fprintf(os.Stderr, "Could not find rule registration block in test file\n")
-	       os.Exit(1)
-       }
-       // Build the new rule registration block
-       var ruleBlock strings.Builder
-       ruleBlock.WriteString(startMarker + "\n")
-       for _, rule := range rules {
-	       ruleBlock.WriteString(fmt.Sprintf("\t{\n"))
-	       ruleBlock.WriteString(fmt.Sprintf("\t\tName: \"fabric_%s\",\n", rule.Name))
-	       ruleBlock.WriteString(fmt.Sprintf("\t\tType: \"%s\",\n", rule.Type))
-	       ruleBlock.WriteString(fmt.Sprintf("\t\tConstructor: func() interface{ Check(tflint.Runner) error } {\n"))
-	       ruleBlock.WriteString(fmt.Sprintf("\t\t\treturn %s()\n", rule.Constructor))
-	       ruleBlock.WriteString(fmt.Sprintf("\t\t},\n"))
-	       ruleBlock.WriteString(fmt.Sprintf("\t},\n"))
-       }
-       ruleBlock.WriteString("// End generated rules list\n")
-       // Replace the old block with the new one
-       newTestContent := string(testContent[:startIdx]) + ruleBlock.String() + string(testContent[endIdx+len(endMarker):])
-       // Write back to the test file
-       err = ioutil.WriteFile(testFile, []byte(newTestContent), 0644)
-       if err != nil {
-	       fmt.Fprintf(os.Stderr, "Error writing updated test file: %v\n", err)
-	       os.Exit(1)
-       }
-       fmt.Println("generated_rules_test.go updated with latest rule registrations.")
+	// Read the generated_rules_test.go file
+	testFile := "rules/generated_rules_test.go"
+	testContent, err := ioutil.ReadFile(testFile)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading test file: %v\n", err)
+		os.Exit(1)
+	}
+	// Find the start and end of the generatedRuleConstructors block
+	startMarker := "generatedRuleConstructors := []GeneratedRuleInfo{"
+	endMarker := "// End generated rules list"
+	startIdx := strings.Index(string(testContent), startMarker)
+	endIdx := strings.Index(string(testContent), endMarker)
+	if startIdx == -1 || endIdx == -1 {
+		fmt.Fprintf(os.Stderr, "Could not find rule registration block in test file\n")
+		os.Exit(1)
+	}
+	// Build the new rule registration block
+	var ruleBlock strings.Builder
+	ruleBlock.WriteString(startMarker + "\n")
+	for _, rule := range rules {
+		ruleBlock.WriteString(fmt.Sprintf("\t{\n"))
+		ruleBlock.WriteString(fmt.Sprintf("\t\tName: \"fabric_%s\",\n", rule.Name))
+		ruleBlock.WriteString(fmt.Sprintf("\t\tType: \"%s\",\n", rule.Type))
+		ruleBlock.WriteString(fmt.Sprintf("\t\tConstructor: func() interface{ Check(tflint.Runner) error } {\n"))
+		ruleBlock.WriteString(fmt.Sprintf("\t\t\treturn %s()\n", rule.Constructor))
+		ruleBlock.WriteString(fmt.Sprintf("\t\t},\n"))
+		ruleBlock.WriteString(fmt.Sprintf("\t},\n"))
+	}
+	ruleBlock.WriteString("// End generated rules list\n")
+	// Replace the old block with the new one
+	newTestContent := string(testContent[:startIdx]) + ruleBlock.String() + string(testContent[endIdx+len(endMarker):])
+	// Write back to the test file
+	err = ioutil.WriteFile(testFile, []byte(newTestContent), 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error writing updated test file: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("generated_rules_test.go updated with latest rule registrations.")
 }
 
 type RuleInfo struct {
@@ -112,21 +113,21 @@ type RuleInfo struct {
 
 func extractConstructor(f *ast.File) (string, string) {
 	for _, decl := range f.Decls {
-	       if d, ok := decl.(*ast.FuncDecl); ok && d.Name.Name != "" {
-		       // Look for New* functions
-		       if strings.HasPrefix(d.Name.Name, "New") {
-			       constructor := d.Name.Name
-			       // Extract type from return type
-			       if d.Type.Results != nil && len(d.Type.Results.List) > 0 {
-				       field := d.Type.Results.List[0]
-				       if star, ok := field.Type.(*ast.StarExpr); ok {
-					       if ident, ok := star.X.(*ast.Ident); ok {
-						       return constructor, ident.Name
-					       }
-				       }
-			       }
-		       }
-	       }
+		if d, ok := decl.(*ast.FuncDecl); ok && d.Name.Name != "" {
+			// Look for New* functions
+			if strings.HasPrefix(d.Name.Name, "New") {
+				constructor := d.Name.Name
+				// Extract type from return type
+				if d.Type.Results != nil && len(d.Type.Results.List) > 0 {
+					field := d.Type.Results.List[0]
+					if star, ok := field.Type.(*ast.StarExpr); ok {
+						if ident, ok := star.X.(*ast.Ident); ok {
+							return constructor, ident.Name
+						}
+					}
+				}
+			}
+		}
 	}
 	return "", ""
 }

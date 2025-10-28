@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricEventstreamInvalidDescription checks whether fabric_eventstream.description is valid
 type FabricEventstreamInvalidDescription struct {
 	tflint.DefaultRule

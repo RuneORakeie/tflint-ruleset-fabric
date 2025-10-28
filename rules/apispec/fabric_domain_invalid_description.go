@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricDomainInvalidDescription checks whether fabric_domain.description is valid
 type FabricDomainInvalidDescription struct {
 	tflint.DefaultRule

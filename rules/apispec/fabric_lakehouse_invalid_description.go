@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricLakehouseInvalidDescription checks whether fabric_lakehouse.description is valid
 type FabricLakehouseInvalidDescription struct {
 	tflint.DefaultRule

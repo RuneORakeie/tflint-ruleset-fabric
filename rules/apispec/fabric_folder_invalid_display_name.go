@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricFolderInvalidDisplayName checks whether fabric_folder.display_name is valid
 type FabricFolderInvalidDisplayName struct {
 	tflint.DefaultRule

@@ -9,7 +9,6 @@ import (
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-
 // FabricConnectionInvalidPrivacyLevel checks whether fabric_connection.privacy_level is valid
 type FabricConnectionInvalidPrivacyLevel struct {
 	tflint.DefaultRule
