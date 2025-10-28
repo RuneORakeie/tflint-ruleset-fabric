@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"testing"
 	"text/template"
 
@@ -60,7 +59,7 @@ func TestIntegration(t *testing.T) {
 			var stdout, stderr bytes.Buffer
 			tc.Command.Stdout = &stdout
 			tc.Command.Stderr = &stderr
-			
+
 			if err := tc.Command.Run(); err != nil {
 				t.Fatalf("Failed: %s, stdout=%s stderr=%s", err, stdout.String(), stderr.String())
 			}
@@ -94,12 +93,12 @@ func readResultFile(dir string) ([]byte, error) {
 			resultFile = "result_windows.json"
 		}
 	}
-	
+
 	tmplFile := filepath.Join(dir, resultFile+".tmpl")
 	if _, err := os.Stat(tmplFile); !os.IsNotExist(err) {
 		return executeTemplate(tmplFile)
 	}
-	
+
 	return os.ReadFile(filepath.Join(dir, resultFile))
 }
 
