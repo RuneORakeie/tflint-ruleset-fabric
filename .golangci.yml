@@ -1,4 +1,4 @@
-version: 2
+version: "2"
 
 linters:
   enable:
@@ -29,6 +29,7 @@ formatters:
     - goimports
   settings:
     goimports:
-      local-prefixes: github.com/RuneORakeie/tflint-ruleset-fabric
+      local-prefixes: 
+        - github.com/RuneORakeie/tflint-ruleset-fabric
 
 
