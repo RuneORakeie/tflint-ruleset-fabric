@@ -10,7 +10,6 @@ linters:
     - errcheck
     - staticcheck
     - gosimple
-    - typecheck
   settings:
     govet:
       enable:
