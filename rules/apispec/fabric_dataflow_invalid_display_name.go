@@ -2,6 +2,7 @@ package apispec
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
