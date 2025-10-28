@@ -3,10 +3,11 @@ package apispec
 import (
 	"fmt"
 	"time"
-	
+
 	"github.com/google/uuid"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -18,13 +19,7 @@ type FabricSparkEnvironmentSettingsInvalidDriverCores struct {
 	attributeName string
 	enum          []string
 
-	format        string
-
-
-
-
-
-
+	format string
 }
 
 // NewFabricRule returns a new rule instance
@@ -32,15 +27,9 @@ func NewFabricSparkEnvironmentSettingsInvalidDriverCores() *FabricSparkEnvironme
 	return &FabricSparkEnvironmentSettingsInvalidDriverCores{
 		resourceType:  "fabric_spark_environment_settings",
 		attributeName: "driver_cores",
-		enum:          []string{ "4", "8", "16", "32", "64",  },
+		enum:          []string{"4", "8", "16", "32", "64"},
 
-		format:        "int32",
-
-
-
-
-
-
+		format: "int32",
 	}
 }
 
@@ -81,7 +70,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Check(runner tflint.R
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -92,13 +80,9 @@ func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Check(runner tflint.R
 			return err
 		}
 
-
 		if err := r.validateFormat(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
 
 	}
 
@@ -117,8 +101,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) validateEnum(runner t
 		attribute.Expr.Range(),
 	)
 }
-
-
 
 func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) validateFormat(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
 	switch r.format {
@@ -141,5 +123,3 @@ func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) validateFormat(runner
 	}
 	return nil
 }
-
-

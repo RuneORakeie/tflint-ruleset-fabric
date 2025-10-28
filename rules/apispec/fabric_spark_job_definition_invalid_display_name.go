@@ -3,8 +3,10 @@ package apispec
 import (
 	"fmt"
 	"regexp"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -15,14 +17,9 @@ type FabricSparkJobDefinitionInvalidDisplayName struct {
 	resourceType  string
 	attributeName string
 
-	pattern       string
+	pattern string
 
-
-
-	maxLength     int
-
-
-
+	maxLength int
 }
 
 // NewFabricRule returns a new rule instance
@@ -31,14 +28,9 @@ func NewFabricSparkJobDefinitionInvalidDisplayName() *FabricSparkJobDefinitionIn
 		resourceType:  "fabric_spark_job_definition",
 		attributeName: "display_name",
 
-		pattern:       `^[a-zA-Z0-9_ ]+$`,
+		pattern: `^[a-zA-Z0-9_ ]+$`,
 
-
-
-		maxLength:     256,
-
-
-
+		maxLength: 256,
 	}
 }
 
@@ -79,18 +71,15 @@ func (r *FabricSparkJobDefinitionInvalidDisplayName) Check(runner tflint.Runner)
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
 			return err
 		}
 
-
 		if err := r.validatePattern(runner, val, attribute); err != nil {
 			return err
 		}
-
 
 		if len(val) > r.maxLength {
 			return runner.EmitIssue(
@@ -100,13 +89,10 @@ func (r *FabricSparkJobDefinitionInvalidDisplayName) Check(runner tflint.Runner)
 			)
 		}
 
-
-
 	}
 
 	return nil
 }
-
 
 func (r *FabricSparkJobDefinitionInvalidDisplayName) validatePattern(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
 	matched, err := regexp.MatchString(r.pattern, val)
@@ -122,6 +108,3 @@ func (r *FabricSparkJobDefinitionInvalidDisplayName) validatePattern(runner tfli
 	}
 	return nil
 }
-
-
-

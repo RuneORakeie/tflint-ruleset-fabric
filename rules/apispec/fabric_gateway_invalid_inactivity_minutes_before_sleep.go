@@ -2,8 +2,10 @@ package apispec
 
 import (
 	"fmt"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -14,14 +16,6 @@ type FabricGatewayInvalidInactivityMinutesBeforeSleep struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +23,7 @@ func NewFabricGatewayInvalidInactivityMinutesBeforeSleep() *FabricGatewayInvalid
 	return &FabricGatewayInvalidInactivityMinutesBeforeSleep{
 		resourceType:  "fabric_gateway",
 		attributeName: "inactivity_minutes_before_sleep",
-		enum:          []string{ "30", "60", "90", "120", "150", "240", "360", "480", "720", "1440",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"30", "60", "90", "120", "150", "240", "360", "480", "720", "1440"},
 	}
 }
 
@@ -78,7 +64,6 @@ func (r *FabricGatewayInvalidInactivityMinutesBeforeSleep) Check(runner tflint.R
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +73,6 @@ func (r *FabricGatewayInvalidInactivityMinutesBeforeSleep) Check(runner tflint.R
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +91,3 @@ func (r *FabricGatewayInvalidInactivityMinutesBeforeSleep) validateEnum(runner t
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

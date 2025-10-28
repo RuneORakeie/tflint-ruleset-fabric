@@ -5,6 +5,7 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -54,17 +55,19 @@ func (r *FabricDeploymentPipelineStagesDisplayNameLength) Check(runner tflint.Ru
 
 	for _, resource := range resourceContent.Blocks {
 		stagesBlocks := resource.Body.Blocks.OfType("stages")
-		
+
 		for _, stage := range stagesBlocks {
 			if attr, exists := stage.Body.Attributes["display_name"]; exists && attr.Expr != nil {
 				var name string
 				if err := runner.EvaluateExpr(attr.Expr, &name, nil); err == nil && name != "" {
 					if len(name) > maxLength {
-						runner.EmitIssue(
+						if err := runner.EmitIssue(
 							r,
 							fmt.Sprintf("Stage display_name must not exceed %d characters (current: %d)", maxLength, len(name)),
 							attr.Range,
-						)
+						); err != nil {
+							return err
+						}
 					}
 				}
 			}

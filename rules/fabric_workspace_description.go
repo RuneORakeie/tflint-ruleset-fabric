@@ -3,6 +3,7 @@ package rules
 import (
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -44,11 +45,13 @@ func (r *FabricWorkspaceDescription) Check(runner tflint.Runner) error {
 	// Iterate over all resource blocks
 	for _, resource := range resourceContent.Blocks {
 		if attr, exists := resource.Body.Attributes["description"]; !exists || attr.Expr == nil {
-			runner.EmitIssue(
+			if err := runner.EmitIssue(
 				r,
 				"Workspace should have a description for governance and documentation",
 				resource.DefRange,
-			)
+			); err != nil {
+				return err
+			}
 		}
 	}
 

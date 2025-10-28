@@ -2,8 +2,10 @@ package apispec
 
 import (
 	"fmt"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -14,14 +16,6 @@ type FabricSparkCustomPoolInvalidNodeFamily struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +23,7 @@ func NewFabricSparkCustomPoolInvalidNodeFamily() *FabricSparkCustomPoolInvalidNo
 	return &FabricSparkCustomPoolInvalidNodeFamily{
 		resourceType:  "fabric_spark_custom_pool",
 		attributeName: "node_family",
-		enum:          []string{ "MemoryOptimized",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"MemoryOptimized"},
 	}
 }
 
@@ -78,7 +64,6 @@ func (r *FabricSparkCustomPoolInvalidNodeFamily) Check(runner tflint.Runner) err
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +73,6 @@ func (r *FabricSparkCustomPoolInvalidNodeFamily) Check(runner tflint.Runner) err
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +91,3 @@ func (r *FabricSparkCustomPoolInvalidNodeFamily) validateEnum(runner tflint.Runn
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

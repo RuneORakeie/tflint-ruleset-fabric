@@ -3,8 +3,10 @@ package apispec
 import (
 	"fmt"
 	"regexp"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -15,14 +17,9 @@ type FabricDataflowInvalidDisplayName struct {
 	resourceType  string
 	attributeName string
 
-	pattern       string
+	pattern string
 
-
-
-	maxLength     int
-
-
-
+	maxLength int
 }
 
 // NewFabricRule returns a new rule instance
@@ -31,14 +28,9 @@ func NewFabricDataflowInvalidDisplayName() *FabricDataflowInvalidDisplayName {
 		resourceType:  "fabric_dataflow",
 		attributeName: "display_name",
 
-		pattern:       `^[a-zA-Z0-9\s()\[\]{}+\-=_#]+$`,
+		pattern: `^[a-zA-Z0-9\s()\[\]{}+\-=_#]+$`,
 
-
-
-		maxLength:     256,
-
-
-
+		maxLength: 256,
 	}
 }
 
@@ -79,18 +71,15 @@ func (r *FabricDataflowInvalidDisplayName) Check(runner tflint.Runner) error {
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
 			return err
 		}
 
-
 		if err := r.validatePattern(runner, val, attribute); err != nil {
 			return err
 		}
-
 
 		if len(val) > r.maxLength {
 			return runner.EmitIssue(
@@ -100,13 +89,10 @@ func (r *FabricDataflowInvalidDisplayName) Check(runner tflint.Runner) error {
 			)
 		}
 
-
-
 	}
 
 	return nil
 }
-
 
 func (r *FabricDataflowInvalidDisplayName) validatePattern(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
 	matched, err := regexp.MatchString(r.pattern, val)
@@ -122,6 +108,3 @@ func (r *FabricDataflowInvalidDisplayName) validatePattern(runner tflint.Runner,
 	}
 	return nil
 }
-
-
-

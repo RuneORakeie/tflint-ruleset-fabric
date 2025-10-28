@@ -22,9 +22,9 @@ type mappingFile struct {
 }
 
 type mapping struct {
-	Resource   string              `hcl:"resource,label"`
-	ImportPath string              `hcl:"import_path"`
-	Attributes []attributeMapping  `hcl:"attribute,block"`
+	Resource   string             `hcl:"resource,label"`
+	ImportPath string             `hcl:"import_path"`
+	Attributes []attributeMapping `hcl:"attribute,block"`
 }
 
 type attributeMapping struct {
@@ -39,11 +39,11 @@ type attributeMapping struct {
 
 // manualConstraint represents manually-added constraints in mapping files
 type manualConstraint struct {
-	MaxLength     *int      `hcl:"max_length,optional"`
-	MinLength     *int      `hcl:"min_length,optional"`
-	Pattern       *string   `hcl:"pattern,optional"`
-	WarnOnExceed  *bool     `hcl:"warn_on_exceed,optional"`
-	ValidValues   []string  `hcl:"valid_values,optional"`
+	MaxLength    *int     `hcl:"max_length,optional"`
+	MinLength    *int     `hcl:"min_length,optional"`
+	Pattern      *string  `hcl:"pattern,optional"`
+	WarnOnExceed *bool    `hcl:"warn_on_exceed,optional"`
+	ValidValues  []string `hcl:"valid_values,optional"`
 }
 
 type apiSpec struct {
@@ -108,12 +108,12 @@ type providerMeta struct {
 }
 
 type ruleDocMeta struct {
-	RuleName     string
-	ResourceType string
+	RuleName      string
+	ResourceType  string
 	AttributeName string
-	BlockType    string
-	Description  string
-	Severity     string
+	BlockType     string
+	Description   string
+	Severity      string
 }
 
 type ruleDocIndexMeta struct {
@@ -145,7 +145,7 @@ var generatedRuleNameCCs []string = []string{}
 
 func main() {
 	parseFlags()
-	
+
 	if SpecsPath == "" {
 		fmt.Println("Error: -specs-path is required")
 		fmt.Println("Usage: go run ./tools/apispec-rule-gen -specs-path /path/to/fabric-rest-api-specs")
@@ -153,13 +153,13 @@ func main() {
 	}
 
 	terraformSchema = loadProviderSchema()
-	
+
 	// Load constraints from schema.json
 	schemaConstraints = extractSchemaConstraints(terraformSchema)
-	
+
 	// Load enum values from schema.json
 	schemaEnums = extractSchemaEnums(terraformSchema)
-	
+
 	// Build a set of known Terraform resources
 	knownResources := make(map[string]bool)
 	for resourceType := range terraformSchema.ResourceSchemas {
@@ -176,16 +176,16 @@ func main() {
 		fmt.Println("Please create mapping files to define resource-to-spec relationships")
 		os.Exit(0)
 	}
-	
+
 	// Check for orphaned mapping files
 	orphanedMappings := checkOrphanedMappings(files, knownResources)
-	
+
 	// Create a set of orphaned mappings for quick lookup
 	orphanedSet := make(map[string]bool)
 	for _, mapping := range orphanedMappings {
 		orphanedSet[mapping] = true
 	}
-	
+
 	if len(orphanedMappings) > 0 {
 		fmt.Println("\n⚠️  WARNING: Found mapping files without corresponding Terraform resources:")
 		for _, mapping := range orphanedMappings {
@@ -200,12 +200,12 @@ func main() {
 		// Extract resource name from filename and check if it's orphaned
 		baseName := filepath.Base(file)
 		resourceName := strings.TrimSuffix(baseName, ".hcl")
-		
+
 		if orphanedSet[resourceName] {
 			// Skip orphaned mapping files
 			continue
 		}
-		
+
 		parser := hclparse.NewParser()
 		f, diags := parser.ParseHCLFile(file)
 		if diags.HasErrors() {
@@ -241,7 +241,7 @@ func main() {
 			if defs, ok := spec["definitions"].(map[string]interface{}); ok {
 				definitions = defs
 			}
-			
+
 			components := make(map[string]interface{})
 			if comps, ok := spec["components"].(map[string]interface{}); ok {
 				if schemas, ok := comps["schemas"].(map[string]interface{}); ok {
@@ -265,11 +265,11 @@ func main() {
 	generateProviderFile(generatedRuleNameCCs)
 	sort.Strings(generatedRuleNames)
 	generateRulesIndexDoc(generatedRuleNames)
-	
+
 	fmt.Printf("\n✅ Generated %d rules\n", len(generatedRuleNames))
 	fmt.Printf("Rules: %s/apispec/\n", RulesPath)
 	fmt.Printf("Docs: %s/rules/\n", DocsPath)
-	
+
 	if len(orphanedMappings) > 0 {
 		fmt.Printf("\n⚠️  %d orphaned mapping files found (see warnings above)\n", len(orphanedMappings))
 	}
@@ -278,18 +278,18 @@ func main() {
 // checkOrphanedMappings finds mapping files that don't have corresponding Terraform resources
 func checkOrphanedMappings(files []string, knownResources map[string]bool) []string {
 	var orphaned []string
-	
+
 	for _, file := range files {
 		// Extract resource name from filename (e.g., /path/to/fabric_workspace.hcl -> fabric_workspace)
 		baseName := filepath.Base(file)
 		resourceName := strings.TrimSuffix(baseName, ".hcl")
-		
+
 		// Check if this resource exists in schema
 		if !knownResources[resourceName] {
 			orphaned = append(orphaned, resourceName)
 		}
 	}
-	
+
 	sort.Strings(orphaned)
 	return orphaned
 }
@@ -299,7 +299,7 @@ func checkOrphanedMappings(files []string, knownResources map[string]bool) []str
 func inferRequestObject(resourceName string, propertyName string, apiSpec apiSpec) string {
 	// Remove fabric_ prefix
 	shortName := strings.TrimPrefix(resourceName, "fabric_")
-	
+
 	// Try common patterns
 	patterns := []string{
 		"Create" + toPascalCase(shortName) + "Request",
@@ -307,12 +307,12 @@ func inferRequestObject(resourceName string, propertyName string, apiSpec apiSpe
 		toPascalCase(shortName) + "Request",
 		toPascalCase(shortName),
 	}
-	
+
 	// Also check if there's a "Reflex" variant (like activator -> Reflex)
 	if shortName == "activator" {
 		patterns = append(patterns, "CreateReflexRequest", "CreateReflex", "ReflexRequest", "Reflex")
 	}
-	
+
 	// Try each pattern
 	for _, pattern := range patterns {
 		if defValue, ok := apiSpec.definitions[pattern]; ok && defValue != nil {
@@ -328,7 +328,7 @@ func inferRequestObject(resourceName string, propertyName string, apiSpec apiSpe
 			}
 		}
 	}
-	
+
 	return ""
 }
 
@@ -348,7 +348,7 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 
 	// Parse the API reference (e.g., "CreateLakehouseRequest.displayName")
 	parts := strings.Split(attr.ApiRef, ".")
-	
+
 	// If only property name is provided, try to infer the request object
 	if len(parts) == 1 {
 		inferredApiRef := inferRequestObject(mapping.Resource, attr.ApiRef, apiSpec)
@@ -359,7 +359,7 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 		fmt.Printf("  Inferred API reference: %s\n", inferredApiRef)
 		parts = strings.Split(inferredApiRef, ".")
 	}
-	
+
 	if len(parts) < 2 {
 		fmt.Printf("Warning: Invalid API reference '%s' for %s.%s\n", attr.ApiRef, mapping.Resource, attr.Name)
 		return
@@ -371,7 +371,7 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 		fmt.Printf("Warning: Definition '%s' not found in API spec for %s.%s\n", parts[0], mapping.Resource, attr.Name)
 		return
 	}
-	
+
 	defMap, ok := defValue.(map[string]interface{})
 	if !ok {
 		fmt.Printf("Warning: Definition '%s' is not a map for %s.%s\n", parts[0], mapping.Resource, attr.Name)
@@ -418,12 +418,12 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 	if validMapping(definition, manualConstraints) {
 		ref := attributeRef{resource: mapping.Resource, attribute: attr.Name}
 		attrSchema := extractAttrSchema(ref, definition, manualConstraints)
-		
+
 		// Skip if attribute not found in Terraform provider
 		if attrSchema.Type == nil {
 			return
 		}
-		
+
 		meta := generateRuleFile(mapping, ref, definition, attrSchema, manualConstraints)
 		generatedRuleNames = append(generatedRuleNames, meta.RuleName)
 		generatedRuleNameCCs = append(generatedRuleNameCCs, meta.RuleNameCC)
@@ -435,12 +435,12 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 func validMapping(definition map[string]interface{}, manualConstraints *manualConstraint) bool {
 	// Check if we have manual constraints
 	if manualConstraints != nil {
-		if manualConstraints.MaxLength != nil || manualConstraints.MinLength != nil || 
-		   manualConstraints.Pattern != nil || len(manualConstraints.ValidValues) > 0 {
+		if manualConstraints.MaxLength != nil || manualConstraints.MinLength != nil ||
+			manualConstraints.Pattern != nil || len(manualConstraints.ValidValues) > 0 {
 			return true
 		}
 	}
-	
+
 	// Otherwise check API spec definition
 	defType, ok := definition["type"].(string)
 	if !ok {
@@ -453,7 +453,7 @@ func validMapping(definition map[string]interface{}, manualConstraints *manualCo
 		if readOnly, ok := definition["readOnly"].(bool); ok && readOnly {
 			return false
 		}
-		
+
 		if _, ok := definition["enum"]; ok {
 			return true
 		}
@@ -511,19 +511,19 @@ func extractAttrSchema(ref attributeRef, definition map[string]interface{}, manu
 
 	// Check if definition has a type field
 	defTypeRaw, hasType := definition["type"]
-	
+
 	// If we have manual ValidValues and no type in definition, skip type validation
 	// This happens with enum references that don't have inline type definitions
 	if (!hasType || defTypeRaw == nil) && manualConstraints != nil && len(manualConstraints.ValidValues) > 0 {
 		// Just return the Terraform schema without validating against API definition type
 		return attrSchema
 	}
-	
+
 	if !hasType || defTypeRaw == nil {
 		fmt.Printf("⚠️  Warning: `%s` has no type in API definition, skipping\n", ref.String())
 		return attribute{}
 	}
-	
+
 	defType, ok := defTypeRaw.(string)
 	if !ok {
 		fmt.Printf("⚠️  Warning: `%s` has non-string type in API definition: %T, skipping\n", ref.String(), defTypeRaw)
@@ -585,7 +585,7 @@ func generateRuleFile(mapping mapping, ref attributeRef, definition map[string]i
 			schemaMaxLength = &maxLen
 		}
 	}
-	
+
 	// Merge constraints with priority: manual > schema.json > API spec
 	if manualConstraints != nil {
 		if manualConstraints.MaxLength != nil {
@@ -598,7 +598,7 @@ func generateRuleFile(mapping mapping, ref attributeRef, definition map[string]i
 			meta.MaxLength = fetchNumber(definition, "maxLength")
 			meta.SetMaxLength = numberExists(definition, "maxLength")
 		}
-		
+
 		if manualConstraints.MinLength != nil {
 			meta.MinLength = *manualConstraints.MinLength
 			meta.SetMinLength = true
@@ -606,15 +606,15 @@ func generateRuleFile(mapping mapping, ref attributeRef, definition map[string]i
 			meta.MinLength = fetchNumber(definition, "minLength")
 			meta.SetMinLength = numberExists(definition, "minLength")
 		}
-		
+
 		if manualConstraints.Pattern != nil {
 			meta.Pattern = *manualConstraints.Pattern
 		}
-		
+
 		if manualConstraints.WarnOnExceed != nil {
 			meta.WarnOnExceed = *manualConstraints.WarnOnExceed
 		}
-		
+
 		if len(manualConstraints.ValidValues) > 0 {
 			// Filter valid_values to only include those supported by Terraform
 			// Check if schema.json has enum constraints for this attribute
@@ -625,7 +625,7 @@ func generateRuleFile(mapping mapping, ref attributeRef, definition map[string]i
 					for _, val := range terraformEnums {
 						terraformSet[val] = true
 					}
-					
+
 					// Filter mapping values to only include Terraform-supported ones
 					var filteredEnums []string
 					for _, val := range manualConstraints.ValidValues {
@@ -633,12 +633,12 @@ func generateRuleFile(mapping mapping, ref attributeRef, definition map[string]i
 							filteredEnums = append(filteredEnums, val)
 						}
 					}
-					
+
 					if len(filteredEnums) > 0 {
 						meta.Enum = filteredEnums
 						// Log if we filtered out values
 						if len(filteredEnums) < len(manualConstraints.ValidValues) {
-							fmt.Printf("  ℹ️  Filtered %s.%s enum from %d to %d values (Terraform-supported only)\n", 
+							fmt.Printf("  ℹ️  Filtered %s.%s enum from %d to %d values (Terraform-supported only)\n",
 								ref.resource, ref.attribute, len(manualConstraints.ValidValues), len(filteredEnums))
 						}
 					}
@@ -745,19 +745,19 @@ var heading = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
 
 func toCamelCase(str string) string {
 	exceptions := map[string]string{
-		"ip":      "IP",
-		"sql":     "SQL",
-		"vm":      "VM",
-		"os":      "OS",
-		"id":      "ID",
-		"tls":     "TLS",
-		"api":     "API",
-		"uuid":    "UUID",
-		"url":     "URL",
-		"kql":     "KQL",
+		"ip":        "IP",
+		"sql":       "SQL",
+		"vm":        "VM",
+		"os":        "OS",
+		"id":        "ID",
+		"tls":       "TLS",
+		"api":       "API",
+		"uuid":      "UUID",
+		"url":       "URL",
+		"kql":       "KQL",
 		"lakehouse": "Lakehouse",
 		"workspace": "Workspace",
-		"fabric":  "Fabric",
+		"fabric":    "Fabric",
 	}
 	parts := strings.Split(str, "_")
 	replaced := make([]string, len(parts))
@@ -780,10 +780,10 @@ func toCamelCase(str string) string {
 func extractSchemaConstraints(schema provider) map[string]map[string]int {
 	constraints := make(map[string]map[string]int)
 	lengthPattern := regexp.MustCompile(`String length must be at most (\d+)`)
-	
+
 	for resourceType, resourceSchema := range schema.ResourceSchemas {
 		resourceConstraints := make(map[string]int)
-		
+
 		// Check top-level attributes
 		for attrName, attrSchema := range resourceSchema.Block.Attributes {
 			if attrSchema.Description != "" {
@@ -796,7 +796,7 @@ func extractSchemaConstraints(schema provider) map[string]map[string]int {
 				}
 			}
 		}
-		
+
 		// Check block-level attributes
 		for blockName, blockSchema := range resourceSchema.Block.BlockTypes {
 			for attrName, attrSchema := range blockSchema.Block.Attributes {
@@ -812,12 +812,12 @@ func extractSchemaConstraints(schema provider) map[string]map[string]int {
 				}
 			}
 		}
-		
+
 		if len(resourceConstraints) > 0 {
 			constraints[resourceType] = resourceConstraints
 		}
 	}
-	
+
 	return constraints
 }
 
@@ -826,10 +826,10 @@ func extractSchemaEnums(schema provider) map[string]map[string][]string {
 	enums := make(map[string]map[string][]string)
 	// Pattern to match: "Value must be one of : `Val1`, `Val2`, `Val3`"
 	enumPattern := regexp.MustCompile(`Value must be one of\s*:\s*([^.]+)`)
-	
+
 	for resourceType, resourceSchema := range schema.ResourceSchemas {
 		resourceEnums := make(map[string][]string)
-		
+
 		// Check top-level attributes
 		for attrName, attrSchema := range resourceSchema.Block.Attributes {
 			if attrSchema.Description != "" {
@@ -854,11 +854,11 @@ func extractSchemaEnums(schema provider) map[string]map[string][]string {
 				}
 			}
 		}
-		
+
 		if len(resourceEnums) > 0 {
 			enums[resourceType] = resourceEnums
 		}
 	}
-	
+
 	return enums
 }

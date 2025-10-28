@@ -5,6 +5,7 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -47,46 +48,46 @@ func (r *FabricCapacityRegion) Check(runner tflint.Runner) error {
 	// Source: https://learn.microsoft.com/en-us/fabric/admin/region-availability
 	allWorkloadsRegions := map[string]bool{
 		// Americas
-		"brazilsouth":      true,
-		"canadacentral":    true,
-		"canadaeast":       true,
-		"centralus":        true,
-		"eastus":           true,
-		"eastus2":          true,
-		"mexicocentral":    true,
-		"northcentralus":   true,
-		"southcentralus":   true,
-		"westus":           true,
-		"westus2":          true,
-		"westus3":          true,
+		"brazilsouth":    true,
+		"canadacentral":  true,
+		"canadaeast":     true,
+		"centralus":      true,
+		"eastus":         true,
+		"eastus2":        true,
+		"mexicocentral":  true,
+		"northcentralus": true,
+		"southcentralus": true,
+		"westus":         true,
+		"westus2":        true,
+		"westus3":        true,
 		// Europe
-		"northeurope":      true,
-		"westeurope":       true,
-		"francecentral":    true,
+		"northeurope":        true,
+		"westeurope":         true,
+		"francecentral":      true,
 		"germanywestcentral": true,
-		"italynorth":       true,
-		"norwayeast":       true,
-		"polandcentral":    true,
-		"spaincentral":     true,
-		"swedencentral":    true,
-		"switzerlandnorth": true,
-		"switzerlandwest":  true,
-		"uksouth":          true,
-		"ukwest":           true,
+		"italynorth":         true,
+		"norwayeast":         true,
+		"polandcentral":      true,
+		"spaincentral":       true,
+		"swedencentral":      true,
+		"switzerlandnorth":   true,
+		"switzerlandwest":    true,
+		"uksouth":            true,
+		"ukwest":             true,
 		// Middle East & Africa
 		"uaenorth":         true,
 		"southafricanorth": true,
 		// Asia Pacific
-		"australiaeast":    true,
+		"australiaeast":      true,
 		"australiasoutheast": true,
-		"centralindia":     true,
-		"eastasia":         true,
-		"israelcentral":    true,
-		"japaneast":        true,
-		"japanwest":        true,
-		"southeastasia":    true,
-		"southindia":       true,
-		"koreacentral":     true,
+		"centralindia":       true,
+		"eastasia":           true,
+		"israelcentral":      true,
+		"japaneast":          true,
+		"japanwest":          true,
+		"southeastasia":      true,
+		"southindia":         true,
+		"koreacentral":       true,
 	}
 
 	for _, resource := range resources.Blocks {
@@ -94,11 +95,13 @@ func (r *FabricCapacityRegion) Check(runner tflint.Runner) error {
 			var region string
 			if err := runner.EvaluateExpr(attr.Expr, &region, nil); err == nil && region != "" {
 				if !allWorkloadsRegions[region] {
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						fmt.Sprintf("Region '%s' may not support all Fabric workloads. Some features might be unavailable. Verify region availability at https://learn.microsoft.com/en-us/fabric/admin/region-availability", region),
 						attr.Range,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}

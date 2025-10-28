@@ -167,6 +167,8 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/hcl"
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 type FabricWorkspaceTags struct {
@@ -203,11 +205,13 @@ func (r *FabricWorkspaceTags) Check(runner tflint.Runner) error {
 		var tags map[string]interface{}
 		err := resource.GetAttribute("tags", &tags)
 		if err != nil || len(tags) == 0 {
-			runner.EmitIssue(
+			if err := runner.EmitIssue(
 				r,
 				"Workspace should have tags for organization and cost tracking",
 				resource.GetNameRange(),
-			)
+			); err != nil {
+						return err
+			}
 		}
 	}
 

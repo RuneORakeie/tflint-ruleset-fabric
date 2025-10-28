@@ -2,8 +2,10 @@ package apispec
 
 import (
 	"fmt"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -14,14 +16,6 @@ type FabricSparkEnvironmentSettingsInvalidDriverMemory struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +23,7 @@ func NewFabricSparkEnvironmentSettingsInvalidDriverMemory() *FabricSparkEnvironm
 	return &FabricSparkEnvironmentSettingsInvalidDriverMemory{
 		resourceType:  "fabric_spark_environment_settings",
 		attributeName: "driver_memory",
-		enum:          []string{ "28g", "56g", "112g", "224g", "400g",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"28g", "56g", "112g", "224g", "400g"},
 	}
 }
 
@@ -78,7 +64,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Check(runner tflint.
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +73,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Check(runner tflint.
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +91,3 @@ func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) validateEnum(runner 
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

@@ -24,7 +24,8 @@ builds:
     binary: tflint-ruleset-fabric
 
 archives:
-  - name_template: >-
+  - format: zip
+    name_template: >-
       {{ .ProjectName }}_
       {{- .Version }}_
       {{- .Os }}_

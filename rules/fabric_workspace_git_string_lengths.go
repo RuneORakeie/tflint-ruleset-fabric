@@ -5,6 +5,7 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -65,7 +66,7 @@ func (r *FabricWorkspaceGitStringLengths) Check(runner tflint.Runner) error {
 
 	for _, resource := range resourceContent.Blocks {
 		gitProviderBlocks := resource.Body.Blocks.OfType("git_provider_details")
-		
+
 		for _, block := range gitProviderBlocks {
 			// Check each attribute
 			for attrName, maxLength := range maxLengths {
@@ -73,11 +74,13 @@ func (r *FabricWorkspaceGitStringLengths) Check(runner tflint.Runner) error {
 					var value string
 					if err := runner.EvaluateExpr(attr.Expr, &value, nil); err == nil && value != "" {
 						if len(value) > maxLength {
-							runner.EmitIssue(
+							if err := runner.EmitIssue(
 								r,
 								fmt.Sprintf("%s must not exceed %d characters (current: %d)", attrName, maxLength, len(value)),
 								attr.Range,
-							)
+							); err != nil {
+								return err
+							}
 						}
 					}
 				}

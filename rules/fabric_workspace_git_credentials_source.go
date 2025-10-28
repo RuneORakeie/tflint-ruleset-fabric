@@ -6,6 +6,7 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -95,12 +96,14 @@ func (r *FabricWorkspaceGitCredentialsSource) Check(runner tflint.Runner) error 
 					}
 
 					if !isValid {
-						runner.EmitIssue(
+						if err := runner.EmitIssue(
 							r,
 							fmt.Sprintf("Invalid git_credentials.source '%s' for git_provider_type '%s'. Must be one of: %s",
 								source, providerType, strings.Join(validSources, ", ")),
 							attr.Range,
-						)
+						); err != nil {
+							return err
+						}
 					}
 				}
 			}

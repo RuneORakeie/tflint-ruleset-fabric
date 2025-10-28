@@ -2,8 +2,10 @@ package apispec
 
 import (
 	"fmt"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -14,14 +16,6 @@ type FabricSparkEnvironmentSettingsInvalidRuntimeVersion struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +23,7 @@ func NewFabricSparkEnvironmentSettingsInvalidRuntimeVersion() *FabricSparkEnviro
 	return &FabricSparkEnvironmentSettingsInvalidRuntimeVersion{
 		resourceType:  "fabric_spark_environment_settings",
 		attributeName: "runtime_version",
-		enum:          []string{ "1.1", "1.2", "1.3",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"1.1", "1.2", "1.3"},
 	}
 }
 
@@ -78,7 +64,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Check(runner tflin
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +73,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Check(runner tflin
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +91,3 @@ func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) validateEnum(runne
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

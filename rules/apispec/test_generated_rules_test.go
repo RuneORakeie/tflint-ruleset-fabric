@@ -141,9 +141,11 @@ func GetGeneratedRules() map[string]GeneratedRuleInfo {
 			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricGatewayInvalidDisplayName() },
 		},
 		{
-			Name:        "fabric_gateway_invalid_inactivity_minutes_before_sleep",
-			Type:        "FabricGatewayInvalidInactivityMinutesBeforeSleep",
-			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricGatewayInvalidInactivityMinutesBeforeSleep() },
+			Name: "fabric_gateway_invalid_inactivity_minutes_before_sleep",
+			Type: "FabricGatewayInvalidInactivityMinutesBeforeSleep",
+			Constructor: func() interface{ Check(tflint.Runner) error } {
+				return NewFabricGatewayInvalidInactivityMinutesBeforeSleep()
+			},
 		},
 		{
 			Name:        "fabric_gateway_invalid_type",
@@ -231,29 +233,39 @@ func GetGeneratedRules() map[string]GeneratedRuleInfo {
 			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricSparkCustomPoolInvalidNodeSize() },
 		},
 		{
-			Name:        "fabric_spark_environment_settings_invalid_driver_cores",
-			Type:        "FabricSparkEnvironmentSettingsInvalidDriverCores",
-			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricSparkEnvironmentSettingsInvalidDriverCores() },
+			Name: "fabric_spark_environment_settings_invalid_driver_cores",
+			Type: "FabricSparkEnvironmentSettingsInvalidDriverCores",
+			Constructor: func() interface{ Check(tflint.Runner) error } {
+				return NewFabricSparkEnvironmentSettingsInvalidDriverCores()
+			},
 		},
 		{
-			Name:        "fabric_spark_environment_settings_invalid_driver_memory",
-			Type:        "FabricSparkEnvironmentSettingsInvalidDriverMemory",
-			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricSparkEnvironmentSettingsInvalidDriverMemory() },
+			Name: "fabric_spark_environment_settings_invalid_driver_memory",
+			Type: "FabricSparkEnvironmentSettingsInvalidDriverMemory",
+			Constructor: func() interface{ Check(tflint.Runner) error } {
+				return NewFabricSparkEnvironmentSettingsInvalidDriverMemory()
+			},
 		},
 		{
-			Name:        "fabric_spark_environment_settings_invalid_executor_cores",
-			Type:        "FabricSparkEnvironmentSettingsInvalidExecutorCores",
-			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricSparkEnvironmentSettingsInvalidExecutorCores() },
+			Name: "fabric_spark_environment_settings_invalid_executor_cores",
+			Type: "FabricSparkEnvironmentSettingsInvalidExecutorCores",
+			Constructor: func() interface{ Check(tflint.Runner) error } {
+				return NewFabricSparkEnvironmentSettingsInvalidExecutorCores()
+			},
 		},
 		{
-			Name:        "fabric_spark_environment_settings_invalid_executor_memory",
-			Type:        "FabricSparkEnvironmentSettingsInvalidExecutorMemory",
-			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricSparkEnvironmentSettingsInvalidExecutorMemory() },
+			Name: "fabric_spark_environment_settings_invalid_executor_memory",
+			Type: "FabricSparkEnvironmentSettingsInvalidExecutorMemory",
+			Constructor: func() interface{ Check(tflint.Runner) error } {
+				return NewFabricSparkEnvironmentSettingsInvalidExecutorMemory()
+			},
 		},
 		{
-			Name:        "fabric_spark_environment_settings_invalid_runtime_version",
-			Type:        "FabricSparkEnvironmentSettingsInvalidRuntimeVersion",
-			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricSparkEnvironmentSettingsInvalidRuntimeVersion() },
+			Name: "fabric_spark_environment_settings_invalid_runtime_version",
+			Type: "FabricSparkEnvironmentSettingsInvalidRuntimeVersion",
+			Constructor: func() interface{ Check(tflint.Runner) error } {
+				return NewFabricSparkEnvironmentSettingsInvalidRuntimeVersion()
+			},
 		},
 		{
 			Name:        "fabric_spark_job_definition_invalid_description",
@@ -392,7 +404,7 @@ func TestGeneratedRulesExecuteAll(t *testing.T) {
 
 	for ruleName, ruleInfo := range generatedRules {
 		rule := ruleInfo.Constructor()
-		ruleMethod := rule.(interface{ Check(tflint.Runner) error }).Check
+		ruleMethod := rule.Check
 
 		// Execute the rule
 		if err := ruleMethod(runner); err != nil {
@@ -466,13 +478,13 @@ func TestGeneratedRulesDiscoveryFromFilesystem(t *testing.T) {
 	registeredRules := GetGeneratedRules()
 	if len(ruleNames) != len(registeredRules) {
 		t.Errorf("Found %d rule files but %d rules registered", len(ruleNames), len(registeredRules))
-		
+
 		// Show which rules are missing
 		registered := make(map[string]bool)
 		for name := range registeredRules {
 			registered[name] = true
 		}
-		
+
 		for _, name := range ruleNames {
 			if !registered[name] {
 				t.Logf("  Missing in registry: %s", name)
@@ -481,12 +493,4 @@ func TestGeneratedRulesDiscoveryFromFilesystem(t *testing.T) {
 	} else {
 		t.Logf("✓ All %d filesystem rules are registered", len(ruleNames))
 	}
-}
-
-// min returns the minimum of two integers
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

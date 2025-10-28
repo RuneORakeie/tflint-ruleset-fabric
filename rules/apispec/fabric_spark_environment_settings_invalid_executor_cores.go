@@ -3,10 +3,11 @@ package apispec
 import (
 	"fmt"
 	"time"
-	
+
 	"github.com/google/uuid"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -18,13 +19,7 @@ type FabricSparkEnvironmentSettingsInvalidExecutorCores struct {
 	attributeName string
 	enum          []string
 
-	format        string
-
-
-
-
-
-
+	format string
 }
 
 // NewFabricRule returns a new rule instance
@@ -32,15 +27,9 @@ func NewFabricSparkEnvironmentSettingsInvalidExecutorCores() *FabricSparkEnviron
 	return &FabricSparkEnvironmentSettingsInvalidExecutorCores{
 		resourceType:  "fabric_spark_environment_settings",
 		attributeName: "executor_cores",
-		enum:          []string{ "4", "8", "16", "32", "64",  },
+		enum:          []string{"4", "8", "16", "32", "64"},
 
-		format:        "int32",
-
-
-
-
-
-
+		format: "int32",
 	}
 }
 
@@ -81,7 +70,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorCores) Check(runner tflint
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -92,13 +80,9 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorCores) Check(runner tflint
 			return err
 		}
 
-
 		if err := r.validateFormat(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
 
 	}
 
@@ -117,8 +101,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorCores) validateEnum(runner
 		attribute.Expr.Range(),
 	)
 }
-
-
 
 func (r *FabricSparkEnvironmentSettingsInvalidExecutorCores) validateFormat(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
 	switch r.format {
@@ -141,5 +123,3 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorCores) validateFormat(runn
 	}
 	return nil
 }
-
-

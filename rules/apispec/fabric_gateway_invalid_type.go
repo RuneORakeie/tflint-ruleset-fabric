@@ -2,8 +2,10 @@ package apispec
 
 import (
 	"fmt"
+
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -14,14 +16,6 @@ type FabricGatewayInvalidType struct {
 	resourceType  string
 	attributeName string
 	enum          []string
-
-
-
-
-
-
-
-
 }
 
 // NewFabricRule returns a new rule instance
@@ -29,15 +23,7 @@ func NewFabricGatewayInvalidType() *FabricGatewayInvalidType {
 	return &FabricGatewayInvalidType{
 		resourceType:  "fabric_gateway",
 		attributeName: "type",
-		enum:          []string{ "VirtualNetwork",  },
-
-
-
-
-
-
-
-
+		enum:          []string{"VirtualNetwork"},
 	}
 }
 
@@ -78,7 +64,6 @@ func (r *FabricGatewayInvalidType) Check(runner tflint.Runner) error {
 			continue
 		}
 
-
 		var val string
 		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
 		if err != nil {
@@ -88,11 +73,6 @@ func (r *FabricGatewayInvalidType) Check(runner tflint.Runner) error {
 		if err := r.validateEnum(runner, val, attribute); err != nil {
 			return err
 		}
-
-
-
-
-
 
 	}
 
@@ -111,7 +91,3 @@ func (r *FabricGatewayInvalidType) validateEnum(runner tflint.Runner, val string
 		attribute.Expr.Range(),
 	)
 }
-
-
-
-

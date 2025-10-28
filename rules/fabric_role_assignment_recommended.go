@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -47,9 +48,9 @@ func extractResourceReference(expr hcl.Expression) string {
 			// Index 0: fabric_workspace (root)
 			// Index 1: example (resource label)
 			// Index 2: id (attribute) - optional
-			
+
 			rootName := traversal.Traversal.RootName() // "fabric_workspace"
-			
+
 			if attr, ok := traversal.Traversal[1].(hcl.TraverseAttr); ok {
 				// Return "fabric_workspace.example"
 				return fmt.Sprintf("%s.%s", rootName, attr.Name)
@@ -62,11 +63,11 @@ func extractResourceReference(expr hcl.Expression) string {
 func (r *FabricRoleAssignmentRecommended) Check(runner tflint.Runner) error {
 	// Define resource types and their corresponding role assignment resources
 	resourceConfigs := []struct {
-		resourceType           string
-		roleAssignmentType     string
-		referenceAttribute     string
-		displayNameAttribute   string
-		resourceTypeFriendly   string
+		resourceType         string
+		roleAssignmentType   string
+		referenceAttribute   string
+		displayNameAttribute string
+		resourceTypeFriendly string
 	}{
 		{
 			resourceType:         "fabric_workspace",
@@ -107,22 +108,14 @@ func (r *FabricRoleAssignmentRecommended) Check(runner tflint.Runner) error {
 	return nil
 }
 
-type resourceConfig struct {
-	resourceType           string
-	roleAssignmentType     string
-	referenceAttribute     string
-	displayNameAttribute   string
-	resourceTypeFriendly   string
-}
-
 func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 	runner tflint.Runner,
 	config struct {
-		resourceType           string
-		roleAssignmentType     string
-		referenceAttribute     string
-		displayNameAttribute   string
-		resourceTypeFriendly   string
+		resourceType         string
+		roleAssignmentType   string
+		referenceAttribute   string
+		displayNameAttribute string
+		resourceTypeFriendly string
 	},
 ) error {
 	// Get all resources of this type
@@ -131,7 +124,7 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 			{Name: config.displayNameAttribute},
 		},
 	}
-	
+
 	resources, err := runner.GetResourceContent(config.resourceType, resourceSchema, nil)
 	if err != nil {
 		return err
@@ -143,7 +136,7 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 			{Name: config.referenceAttribute},
 		},
 	}
-	
+
 	roleAssignments, err := runner.GetResourceContent(config.roleAssignmentType, roleAssignmentSchema, nil)
 	if err != nil {
 		return err
@@ -151,7 +144,7 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 
 	// Build a set of resource IDs that have role assignments
 	resourcesWithRoles := make(map[string]bool)
-	
+
 	for _, block := range roleAssignments.Blocks {
 		if attr, exists := block.Body.Attributes[config.referenceAttribute]; exists && attr.Expr != nil {
 			// Extract resource reference from HCL expression
@@ -172,26 +165,28 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 		resourceRef := fmt.Sprintf("%s.%s", config.resourceType, block.Labels[1])
 
 		fmt.Printf("DEBUG: NOW checking resource: %s, in map: %v\n", resourceRef, resourcesWithRoles[resourceRef])
-		
+
 		// If this resource doesn't have any role assignments, emit a warning
 		if !resourcesWithRoles[resourceRef] {
 			var displayName string
 			if attr, exists := block.Body.Attributes[config.displayNameAttribute]; exists {
 				_ = runner.EvaluateExpr(attr.Expr, &displayName, nil)
 			}
-			
-			message := fmt.Sprintf("%s '%s' does not have any role assignments. This resource may not be accessible to users.", 
+
+			message := fmt.Sprintf("%s '%s' does not have any role assignments. This resource may not be accessible to users.",
 				config.resourceTypeFriendly, block.Labels[0])
 			if displayName != "" {
-				message = fmt.Sprintf("%s '%s' (%s) does not have any role assignments. This resource may not be accessible to users.", 
+				message = fmt.Sprintf("%s '%s' (%s) does not have any role assignments. This resource may not be accessible to users.",
 					config.resourceTypeFriendly, displayName, block.Labels[0])
 			}
-			
-			runner.EmitIssue(
+
+			if err := runner.EmitIssue(
 				r,
 				message,
 				block.DefRange,
-			)
+			); err != nil {
+				return err
+			}
 		}
 	}
 

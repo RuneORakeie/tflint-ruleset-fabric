@@ -6,6 +6,7 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
 	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
@@ -45,9 +46,9 @@ func (r *FabricDomainContributorsScope) Check(runner tflint.Runner) error {
 	}
 
 	validScopes := map[string]bool{
-		"AdminsOnly":              true,
-		"AllTenant":               true,
-		"SpecificUsersAndGroups":  true,
+		"AdminsOnly":             true,
+		"AllTenant":              true,
+		"SpecificUsersAndGroups": true,
 	}
 
 	for _, resource := range resourceContent.Blocks {
@@ -56,11 +57,13 @@ func (r *FabricDomainContributorsScope) Check(runner tflint.Runner) error {
 			if err := runner.EvaluateExpr(attr.Expr, &scope, nil); err == nil && scope != "" {
 				if !validScopes[scope] {
 					validScopesList := []string{"AdminsOnly", "AllTenant", "SpecificUsersAndGroups"}
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						fmt.Sprintf("Invalid contributors_scope '%s'. Must be one of: %s", scope, strings.Join(validScopesList, ", ")),
 						attr.Range,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}
