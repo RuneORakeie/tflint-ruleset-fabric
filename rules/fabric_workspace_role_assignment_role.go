@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceRoleAssignmentRole validates workspace role values
@@ -57,11 +58,13 @@ func (r *FabricWorkspaceRoleAssignmentRole) Check(runner tflint.Runner) error {
 			if err := runner.EvaluateExpr(attr.Expr, &role, nil); err == nil && role != "" {
 				if !validRoles[role] {
 					validRolesList := []string{"Admin", "Contributor", "Member", "Viewer"}
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						fmt.Sprintf("Invalid workspace role '%s'. Must be one of: %s", role, strings.Join(validRolesList, ", ")),
 						attr.Range,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}

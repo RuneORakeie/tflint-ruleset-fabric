@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitDirectoryName validates directory_name format and length
@@ -62,20 +63,24 @@ func (r *FabricWorkspaceGitDirectoryName) Check(runner tflint.Runner) error {
 				if err := runner.EvaluateExpr(attr.Expr, &directoryName, nil); err == nil && directoryName != "" {
 					// Check if starts with /
 					if !strings.HasPrefix(directoryName, "/") {
-						runner.EmitIssue(
+						if err := runner.EmitIssue(
 							r,
 							"directory_name must start with forward slash '/'",
 							attr.Range,
-						)
+						); err != nil {
+							return err
+						}
 					}
 
 					// Check length
 					if len(directoryName) > maxLength {
-						runner.EmitIssue(
+						if err := runner.EmitIssue(
 							r,
 							fmt.Sprintf("directory_name must not exceed %d characters (current: %d)", maxLength, len(directoryName)),
 							attr.Range,
-						)
+						); err != nil {
+							return err
+						}
 					}
 				}
 			}

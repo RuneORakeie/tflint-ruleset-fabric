@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitInitializationStrategy validates initialization_strategy values
@@ -55,11 +56,13 @@ func (r *FabricWorkspaceGitInitializationStrategy) Check(runner tflint.Runner) e
 			if err := runner.EvaluateExpr(attr.Expr, &strategy, nil); err == nil && strategy != "" {
 				if !validStrategies[strategy] {
 					validStrategiesList := []string{"PreferRemote", "PreferWorkspace"}
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						fmt.Sprintf("Invalid initialization_strategy '%s'. Must be one of: %s", strategy, strings.Join(validStrategiesList, ", ")),
 						attr.Range,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}

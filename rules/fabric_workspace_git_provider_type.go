@@ -3,9 +3,10 @@ package rules
 import (
 	"fmt"
 
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitProviderType validates Git provider type
@@ -63,11 +64,13 @@ func (r *FabricWorkspaceGitProviderType) Check(runner tflint.Runner) error {
 				var provider string
 				if err := runner.EvaluateExpr(attr.Expr, &provider, nil); err == nil && provider != "" {
 					if !validProviders[provider] {
-						runner.EmitIssue(
+						if err := runner.EmitIssue(
 							r,
 							fmt.Sprintf("Invalid git_provider_type '%s'. Must be one of: AzureDevOps, GitHub", provider),
 							attr.Range,
-						)
+						); err != nil {
+							return err
+						}
 					}
 				}
 			}

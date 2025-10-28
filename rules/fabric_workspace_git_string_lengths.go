@@ -3,9 +3,10 @@ package rules
 import (
 	"fmt"
 
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitStringLengths validates string length constraints for git_provider_details attributes
@@ -73,11 +74,13 @@ func (r *FabricWorkspaceGitStringLengths) Check(runner tflint.Runner) error {
 					var value string
 					if err := runner.EvaluateExpr(attr.Expr, &value, nil); err == nil && value != "" {
 						if len(value) > maxLength {
-							runner.EmitIssue(
+							if err := runner.EmitIssue(
 								r,
 								fmt.Sprintf("%s must not exceed %d characters (current: %d)", attrName, maxLength, len(value)),
 								attr.Range,
-							)
+							); err != nil {
+								return err
+							}
 						}
 					}
 				}

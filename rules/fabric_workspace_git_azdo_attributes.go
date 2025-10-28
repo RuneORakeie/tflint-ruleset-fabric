@@ -1,9 +1,10 @@
 package rules
 
 import (
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitAzureDevOpsAttributes validates required attributes for AzureDevOps provider
@@ -63,20 +64,24 @@ func (r *FabricWorkspaceGitAzureDevOpsAttributes) Check(runner tflint.Runner) er
 			if providerType == "AzureDevOps" {
 				// Check organization_name
 				if attr, exists := block.Body.Attributes["organization_name"]; !exists || attr.Expr == nil {
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						"organization_name is required when git_provider_type is 'AzureDevOps'",
 						block.DefRange,
-					)
+					); err != nil {
+						return err
+				}
 				}
 
 				// Check project_name
 				if attr, exists := block.Body.Attributes["project_name"]; !exists || attr.Expr == nil {
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						"project_name is required when git_provider_type is 'AzureDevOps'",
 						block.DefRange,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}

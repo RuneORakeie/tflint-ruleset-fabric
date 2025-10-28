@@ -1,9 +1,10 @@
 package rules
 
 import (
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceCapacity ensures capacity is assigned to workspaces
@@ -44,11 +45,13 @@ func (r *FabricWorkspaceCapacity) Check(runner tflint.Runner) error {
 	// Iterate over all resource blocks
 	for _, resource := range resourceContent.Blocks {
 		if attr, exists := resource.Body.Attributes["capacity_id"]; !exists || attr.Expr == nil {
-			runner.EmitIssue(
+			if err := runner.EmitIssue(
 				r,
 				"Workspace should have a capacity assigned for production use",
 				resource.DefRange,
-			)
+			); err != nil {
+						return err
+			}
 		}
 	}
 

@@ -1,9 +1,10 @@
 package rules
 
 import (
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricWorkspaceGitGitHubAttributes validates required attributes for GitHub provider
@@ -62,11 +63,13 @@ func (r *FabricWorkspaceGitGitHubAttributes) Check(runner tflint.Runner) error {
 			if providerType == "GitHub" {
 				// Check owner_name
 				if attr, exists := block.Body.Attributes["owner_name"]; !exists || attr.Expr == nil {
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						"owner_name is required when git_provider_type is 'GitHub'",
 						block.DefRange,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}
