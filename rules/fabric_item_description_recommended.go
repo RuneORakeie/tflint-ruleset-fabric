@@ -1,9 +1,10 @@
 package rules
 
 import (
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricItemDescriptionRecommended warns when items don't have descriptions
@@ -69,20 +70,24 @@ func (r *FabricItemDescriptionRecommended) Check(runner tflint.Runner) error {
 
 		for _, resource := range resourceContent.Blocks {
 			if attr, exists := resource.Body.Attributes["description"]; !exists || attr.Expr == nil {
-				runner.EmitIssue(
+				if err := runner.EmitIssue(
 					r,
 					"Adding a description improves documentation and governance of your Fabric environment. Consider including the purpose, owner, and any relevant business context.",
 					resource.DefRange,
-				)
+				); err != nil {
+					return err
+				}
 			} else {
 				// Check if description is empty string
 				var description string
 				if err := runner.EvaluateExpr(attr.Expr, &description, nil); err == nil && description == "" {
-					runner.EmitIssue(
+					if err := runner.EmitIssue(
 						r,
 						"Description is empty. Consider adding meaningful information about the purpose, owner, and business context of this resource.",
 						attr.Range,
-					)
+					); err != nil {
+						return err
+					}
 				}
 			}
 		}

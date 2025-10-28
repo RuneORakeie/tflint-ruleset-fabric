@@ -3,11 +3,12 @@ package rules
 import (
 	"fmt"
 
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
 // FabricRoleAssignmentRecommended warns when resources are created without role assignments
@@ -179,11 +180,13 @@ func (r *FabricRoleAssignmentRecommended) checkResourceRoleAssignments(
 					config.resourceTypeFriendly, displayName, block.Labels[0])
 			}
 
-			runner.EmitIssue(
+			if err := runner.EmitIssue(
 				r,
 				message,
 				block.DefRange,
-			)
+			); err != nil {
+				return err
+			}
 		}
 	}
 

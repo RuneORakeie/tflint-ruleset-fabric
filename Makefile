@@ -1,11 +1,20 @@
+# Detect OS
+ifeq ($(OS),Windows_NT)
+    BINARY_NAME := tflint-ruleset-fabric.exe
+    EXE_EXT := .exe
+else
+    BINARY_NAME := tflint-ruleset-fabric
+    EXE_EXT :=
+endif
+
 .PHONY: build
 build:
-	go build -v -o tflint-ruleset-fabric
+	go build -v -o $(BINARY_NAME)
 
 .PHONY: install
 install: build
 	@mkdir -p ~/.tflint.d/plugins
-	@cp ./tflint-ruleset-fabric ~/.tflint.d/plugins/tflint-ruleset-fabric
+	@cp ./$(BINARY_NAME) ~/.tflint.d/plugins/tflint-ruleset-fabric$(EXE_EXT)
 
 .PHONY: test
 test:
@@ -30,7 +39,7 @@ lint:
 
 .PHONY: clean
 clean:
-	rm -f tflint-ruleset-fabric
+	rm -f tflint-ruleset-fabric$(EXE_EXT)
 	rm -f coverage.txt coverage.html
 	rm -rf dist/
 
