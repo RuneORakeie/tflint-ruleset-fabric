@@ -48,16 +48,25 @@ func (r *{{ .RuleNameCC }}) Check(runner tflint.Runner) error {
             continue
         }
 
-        if {{ .SetMaxLength }} && len(v) > {{ .MaxLength }} {
-            if err := runner.EmitIssue(r, fmt.Sprintf("%s exceeds max length %d", "{{ .AttributeName }}", {{ .MaxLength }}), attr.Expr.Range()); err != nil {
-                return err
-            }
-        }
-        if {{ .SetMinLength }} && len(v) < {{ .MinLength }} {
-            if err := runner.EmitIssue(r, fmt.Sprintf("%s shorter than min length %d", "{{ .AttributeName }}", {{ .MinLength }}), attr.Expr.Range()); err != nil {
-                return err
-            }
-        }
+		{{- if .SetMaxLength }}
+				if len(v) > {{ .MaxLength }} {
+					if err := runner.EmitIssue(r,
+						fmt.Sprintf("%s exceeds max length %d", "{{ .AttributeName }}", {{ .MaxLength }}),
+						attr.Expr.Range()); err != nil {
+						return err
+					}
+				}
+		{{- end }}
+		
+		{{- if .SetMinLength }}
+				if len(v) < {{ .MinLength }} {
+					if err := runner.EmitIssue(r,
+						fmt.Sprintf("%s shorter than min length %d", "{{ .AttributeName }}", {{ .MinLength }}),
+						attr.Expr.Range()); err != nil {
+						return err
+					}
+				}
+		{{- end }}
         // TODO: add pattern/enum checks if needed
     }
 
