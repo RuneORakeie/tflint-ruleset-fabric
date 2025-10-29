@@ -1,9 +1,10 @@
 package apispec
 
 import (
-    "fmt"
+	"fmt"
 
     "github.com/terraform-linters/tflint-plugin-sdk/tflint"
+    "github.com/terraform-linters/tflint-plugin-sdk/helper"
     "github.com/terraform-linters/tflint-plugin-sdk/hclext"
 )
 
@@ -57,7 +58,7 @@ func (r *{{ .RuleNameCC }}) Check(runner tflint.Runner) error {
 					}
 				}
 		{{- end }}
-		
+
 		{{- if .SetMinLength }}
 				if len(v) < {{ .MinLength }} {
 					if err := runner.EmitIssue(r,
