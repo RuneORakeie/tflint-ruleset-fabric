@@ -5,81 +5,60 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// FabricDomainInvalidDescription checks whether fabric_domain.description is valid
-type FabricDomainInvalidDescription struct {
-	tflint.DefaultRule
+type FabricDomainInvalidDescription struct{ tflint.DefaultRule }
 
-	resourceType  string
-	attributeName string
-
-	maxLength int
-}
-
-// NewFabricRule returns a new rule instance
 func NewFabricDomainInvalidDescription() *FabricDomainInvalidDescription {
-	return &FabricDomainInvalidDescription{
-		resourceType:  "fabric_domain",
-		attributeName: "description",
-
-		maxLength: 256,
-	}
+	return &FabricDomainInvalidDescription{}
 }
 
-// Name returns the rule name
-func (r *FabricDomainInvalidDescription) Name() string {
-	return "fabric_domain_invalid_description"
-}
-
-// Enabled returns whether the rule is enabled by default
-func (r *FabricDomainInvalidDescription) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *FabricDomainInvalidDescription) Severity() tflint.Severity {
-	return tflint.ERROR
-}
-
-// Link returns the rule reference link
+func (r *FabricDomainInvalidDescription) Name() string              { return "fabric_domain_invalid_description" }
+func (r *FabricDomainInvalidDescription) Enabled() bool             { return true }
+func (r *FabricDomainInvalidDescription) Severity() tflint.Severity { return tflint.ERROR }
 func (r *FabricDomainInvalidDescription) Link() string {
-	return project.ReferenceLink(r.Name())
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/admin/definitions/domains.json"
 }
 
-// Check validates the resource
 func (r *FabricDomainInvalidDescription) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent(r.resourceType, &hclext.BodySchema{
-		Attributes: []hclext.AttributeSchema{
-			{Name: r.attributeName},
+	content, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "description"},
+					},
+				},
+			},
 		},
 	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources.Blocks {
-		attribute, exists := resource.Body.Attributes[r.attributeName]
-		if !exists {
+	for _, block := range content.Blocks {
+		if block.Labels[0] != "fabric_domain" {
+			continue
+		}
+		attr, ok := block.Body.Attributes["description"]
+		if !ok {
 			continue
 		}
 
-		var val string
-		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
-		if err != nil {
-			return err
+		var v string
+		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
+			continue
 		}
-
-		if len(val) > r.maxLength {
-			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("description must be at most %d characters (actual: %d)", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			)
+		if len(v) > 256 {
+			if err := runner.EmitIssue(r,
+				fmt.Sprintf("%s exceeds max length %d", "description", 256),
+				attr.Expr.Range()); err != nil {
+				return err
+			}
 		}
-
+		// TODO: add pattern/enum checks if needed
 	}
 
 	return nil

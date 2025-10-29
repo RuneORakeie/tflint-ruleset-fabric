@@ -19,7 +19,6 @@ func main() {
 	allRules := []tflint.Rule{
 		// Workspace rules
 		rules.NewFabricWorkspaceCapacity(),
-		rules.NewFabricWorkspaceDescription(),
 		rules.NewFabricWorkspaceRoleAssignmentRole(),
 
 		// Role assignment rules

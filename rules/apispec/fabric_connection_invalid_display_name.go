@@ -5,81 +5,62 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// FabricConnectionInvalidDisplayName checks whether fabric_connection.display_name is valid
-type FabricConnectionInvalidDisplayName struct {
-	tflint.DefaultRule
+type FabricConnectionInvalidDisplayName struct{ tflint.DefaultRule }
 
-	resourceType  string
-	attributeName string
-
-	maxLength int
-}
-
-// NewFabricRule returns a new rule instance
 func NewFabricConnectionInvalidDisplayName() *FabricConnectionInvalidDisplayName {
-	return &FabricConnectionInvalidDisplayName{
-		resourceType:  "fabric_connection",
-		attributeName: "display_name",
-
-		maxLength: 200,
-	}
+	return &FabricConnectionInvalidDisplayName{}
 }
 
-// Name returns the rule name
 func (r *FabricConnectionInvalidDisplayName) Name() string {
 	return "fabric_connection_invalid_display_name"
 }
-
-// Enabled returns whether the rule is enabled by default
-func (r *FabricConnectionInvalidDisplayName) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *FabricConnectionInvalidDisplayName) Severity() tflint.Severity {
-	return tflint.ERROR
-}
-
-// Link returns the rule reference link
+func (r *FabricConnectionInvalidDisplayName) Enabled() bool             { return true }
+func (r *FabricConnectionInvalidDisplayName) Severity() tflint.Severity { return tflint.ERROR }
 func (r *FabricConnectionInvalidDisplayName) Link() string {
-	return project.ReferenceLink(r.Name())
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/connections.json"
 }
 
-// Check validates the resource
 func (r *FabricConnectionInvalidDisplayName) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent(r.resourceType, &hclext.BodySchema{
-		Attributes: []hclext.AttributeSchema{
-			{Name: r.attributeName},
+	content, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "display_name"},
+					},
+				},
+			},
 		},
 	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources.Blocks {
-		attribute, exists := resource.Body.Attributes[r.attributeName]
-		if !exists {
+	for _, block := range content.Blocks {
+		if block.Labels[0] != "fabric_connection" {
+			continue
+		}
+		attr, ok := block.Body.Attributes["display_name"]
+		if !ok {
 			continue
 		}
 
-		var val string
-		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
-		if err != nil {
-			return err
+		var v string
+		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
+			continue
 		}
-
-		if len(val) > r.maxLength {
-			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("display_name must be at most %d characters (actual: %d)", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			)
+		if len(v) > 200 {
+			if err := runner.EmitIssue(r,
+				fmt.Sprintf("%s exceeds max length %d", "display_name", 200),
+				attr.Expr.Range()); err != nil {
+				return err
+			}
 		}
-
+		// TODO: add pattern/enum checks if needed
 	}
 
 	return nil

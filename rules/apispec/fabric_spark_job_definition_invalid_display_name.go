@@ -2,109 +2,66 @@ package apispec
 
 import (
 	"fmt"
-	"regexp"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// FabricSparkJobDefinitionInvalidDisplayName checks whether fabric_spark_job_definition.display_name is valid
-type FabricSparkJobDefinitionInvalidDisplayName struct {
-	tflint.DefaultRule
+type FabricSparkJobDefinitionInvalidDisplayName struct{ tflint.DefaultRule }
 
-	resourceType  string
-	attributeName string
-
-	pattern string
-
-	maxLength int
-}
-
-// NewFabricRule returns a new rule instance
 func NewFabricSparkJobDefinitionInvalidDisplayName() *FabricSparkJobDefinitionInvalidDisplayName {
-	return &FabricSparkJobDefinitionInvalidDisplayName{
-		resourceType:  "fabric_spark_job_definition",
-		attributeName: "display_name",
-
-		pattern: `^[a-zA-Z0-9_ ]+$`,
-
-		maxLength: 256,
-	}
+	return &FabricSparkJobDefinitionInvalidDisplayName{}
 }
 
-// Name returns the rule name
 func (r *FabricSparkJobDefinitionInvalidDisplayName) Name() string {
 	return "fabric_spark_job_definition_invalid_display_name"
 }
-
-// Enabled returns whether the rule is enabled by default
-func (r *FabricSparkJobDefinitionInvalidDisplayName) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *FabricSparkJobDefinitionInvalidDisplayName) Severity() tflint.Severity {
-	return tflint.ERROR
-}
-
-// Link returns the rule reference link
+func (r *FabricSparkJobDefinitionInvalidDisplayName) Enabled() bool             { return true }
+func (r *FabricSparkJobDefinitionInvalidDisplayName) Severity() tflint.Severity { return tflint.ERROR }
 func (r *FabricSparkJobDefinitionInvalidDisplayName) Link() string {
-	return project.ReferenceLink(r.Name())
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/sparkjobdefinition/definitions.json"
 }
 
-// Check validates the resource
 func (r *FabricSparkJobDefinitionInvalidDisplayName) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent(r.resourceType, &hclext.BodySchema{
-		Attributes: []hclext.AttributeSchema{
-			{Name: r.attributeName},
+	content, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "display_name"},
+					},
+				},
+			},
 		},
 	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources.Blocks {
-		attribute, exists := resource.Body.Attributes[r.attributeName]
-		if !exists {
+	for _, block := range content.Blocks {
+		if block.Labels[0] != "fabric_spark_job_definition" {
+			continue
+		}
+		attr, ok := block.Body.Attributes["display_name"]
+		if !ok {
 			continue
 		}
 
-		var val string
-		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
-		if err != nil {
-			return err
+		var v string
+		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
+			continue
 		}
-
-		if err := r.validatePattern(runner, val, attribute); err != nil {
-			return err
+		if len(v) > 256 {
+			if err := runner.EmitIssue(r,
+				fmt.Sprintf("%s exceeds max length %d", "display_name", 256),
+				attr.Expr.Range()); err != nil {
+				return err
+			}
 		}
-
-		if len(val) > r.maxLength {
-			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("display_name must be at most %d characters (actual: %d)", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			)
-		}
-
+		// TODO: add pattern/enum checks if needed
 	}
 
-	return nil
-}
-
-func (r *FabricSparkJobDefinitionInvalidDisplayName) validatePattern(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
-	matched, err := regexp.MatchString(r.pattern, val)
-	if err != nil {
-		return err
-	}
-	if !matched {
-		return runner.EmitIssue(
-			r,
-			fmt.Sprintf("display_name does not match required pattern: %s", r.pattern),
-			attribute.Expr.Range(),
-		)
-	}
 	return nil
 }

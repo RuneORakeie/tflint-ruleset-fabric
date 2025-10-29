@@ -307,6 +307,26 @@ func GetGeneratedRules() map[string]GeneratedRuleInfo {
 			Type:        "FabricWorkspaceInvalidDisplayName",
 			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricWorkspaceInvalidDisplayName() },
 		},
+		{
+			Name:        "fabric_domain_invalid_parent_domain_id",
+			Type:        "FabricDomainInvalidParentDomainID",
+			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricDomainInvalidParentDomainID() },
+		},
+		{
+			Name:        "fabric_eventhouse_invalid_format",
+			Type:        "FabricEventhouseInvalidFormat",
+			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricEventhouseInvalidFormat() },
+		},
+		{
+			Name:        "fabric_folder_invalid_parent_folder_id",
+			Type:        "FabricFolderInvalidParentFolderID",
+			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricFolderInvalidParentFolderID() },
+		},
+		{
+			Name:        "fabric_workspace_invalid_capacity_id",
+			Type:        "FabricWorkspaceInvalidCapacityID",
+			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricWorkspaceInvalidCapacityID() },
+		},
 	}
 
 	for _, rule := range generatedRuleConstructors {

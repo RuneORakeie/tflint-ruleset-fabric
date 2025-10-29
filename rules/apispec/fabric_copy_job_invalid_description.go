@@ -5,81 +5,60 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// FabricCopyJobInvalidDescription checks whether fabric_copy_job.description is valid
-type FabricCopyJobInvalidDescription struct {
-	tflint.DefaultRule
+type FabricCopyJobInvalidDescription struct{ tflint.DefaultRule }
 
-	resourceType  string
-	attributeName string
-
-	maxLength int
-}
-
-// NewFabricRule returns a new rule instance
 func NewFabricCopyJobInvalidDescription() *FabricCopyJobInvalidDescription {
-	return &FabricCopyJobInvalidDescription{
-		resourceType:  "fabric_copy_job",
-		attributeName: "description",
-
-		maxLength: 1021,
-	}
+	return &FabricCopyJobInvalidDescription{}
 }
 
-// Name returns the rule name
-func (r *FabricCopyJobInvalidDescription) Name() string {
-	return "fabric_copy_job_invalid_description"
-}
-
-// Enabled returns whether the rule is enabled by default
-func (r *FabricCopyJobInvalidDescription) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *FabricCopyJobInvalidDescription) Severity() tflint.Severity {
-	return tflint.ERROR
-}
-
-// Link returns the rule reference link
+func (r *FabricCopyJobInvalidDescription) Name() string              { return "fabric_copy_job_invalid_description" }
+func (r *FabricCopyJobInvalidDescription) Enabled() bool             { return true }
+func (r *FabricCopyJobInvalidDescription) Severity() tflint.Severity { return tflint.ERROR }
 func (r *FabricCopyJobInvalidDescription) Link() string {
-	return project.ReferenceLink(r.Name())
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/copyJob/definitions.json"
 }
 
-// Check validates the resource
 func (r *FabricCopyJobInvalidDescription) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent(r.resourceType, &hclext.BodySchema{
-		Attributes: []hclext.AttributeSchema{
-			{Name: r.attributeName},
+	content, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "description"},
+					},
+				},
+			},
 		},
 	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources.Blocks {
-		attribute, exists := resource.Body.Attributes[r.attributeName]
-		if !exists {
+	for _, block := range content.Blocks {
+		if block.Labels[0] != "fabric_copy_job" {
+			continue
+		}
+		attr, ok := block.Body.Attributes["description"]
+		if !ok {
 			continue
 		}
 
-		var val string
-		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
-		if err != nil {
-			return err
+		var v string
+		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
+			continue
 		}
-
-		if len(val) > r.maxLength {
-			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("description must be at most %d characters (actual: %d)", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			)
+		if len(v) > 1021 {
+			if err := runner.EmitIssue(r,
+				fmt.Sprintf("%s exceeds max length %d", "description", 1021),
+				attr.Expr.Range()); err != nil {
+				return err
+			}
 		}
-
+		// TODO: add pattern/enum checks if needed
 	}
 
 	return nil

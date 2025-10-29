@@ -5,81 +5,60 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// FabricFolderInvalidDisplayName checks whether fabric_folder.display_name is valid
-type FabricFolderInvalidDisplayName struct {
-	tflint.DefaultRule
+type FabricFolderInvalidDisplayName struct{ tflint.DefaultRule }
 
-	resourceType  string
-	attributeName string
-
-	maxLength int
-}
-
-// NewFabricRule returns a new rule instance
 func NewFabricFolderInvalidDisplayName() *FabricFolderInvalidDisplayName {
-	return &FabricFolderInvalidDisplayName{
-		resourceType:  "fabric_folder",
-		attributeName: "display_name",
-
-		maxLength: 255,
-	}
+	return &FabricFolderInvalidDisplayName{}
 }
 
-// Name returns the rule name
-func (r *FabricFolderInvalidDisplayName) Name() string {
-	return "fabric_folder_invalid_display_name"
-}
-
-// Enabled returns whether the rule is enabled by default
-func (r *FabricFolderInvalidDisplayName) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *FabricFolderInvalidDisplayName) Severity() tflint.Severity {
-	return tflint.ERROR
-}
-
-// Link returns the rule reference link
+func (r *FabricFolderInvalidDisplayName) Name() string              { return "fabric_folder_invalid_display_name" }
+func (r *FabricFolderInvalidDisplayName) Enabled() bool             { return true }
+func (r *FabricFolderInvalidDisplayName) Severity() tflint.Severity { return tflint.ERROR }
 func (r *FabricFolderInvalidDisplayName) Link() string {
-	return project.ReferenceLink(r.Name())
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/platform.json"
 }
 
-// Check validates the resource
 func (r *FabricFolderInvalidDisplayName) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent(r.resourceType, &hclext.BodySchema{
-		Attributes: []hclext.AttributeSchema{
-			{Name: r.attributeName},
+	content, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "display_name"},
+					},
+				},
+			},
 		},
 	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources.Blocks {
-		attribute, exists := resource.Body.Attributes[r.attributeName]
-		if !exists {
+	for _, block := range content.Blocks {
+		if block.Labels[0] != "fabric_folder" {
+			continue
+		}
+		attr, ok := block.Body.Attributes["display_name"]
+		if !ok {
 			continue
 		}
 
-		var val string
-		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
-		if err != nil {
-			return err
+		var v string
+		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
+			continue
 		}
-
-		if len(val) > r.maxLength {
-			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("display_name must be at most %d characters (actual: %d)", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			)
+		if len(v) > 255 {
+			if err := runner.EmitIssue(r,
+				fmt.Sprintf("%s exceeds max length %d", "display_name", 255),
+				attr.Expr.Range()); err != nil {
+				return err
+			}
 		}
-
+		// TODO: add pattern/enum checks if needed
 	}
 
 	return nil

@@ -5,81 +5,62 @@ import (
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// FabricMirroredDatabaseInvalidDescription checks whether fabric_mirrored_database.description is valid
-type FabricMirroredDatabaseInvalidDescription struct {
-	tflint.DefaultRule
+type FabricMirroredDatabaseInvalidDescription struct{ tflint.DefaultRule }
 
-	resourceType  string
-	attributeName string
-
-	maxLength int
-}
-
-// NewFabricRule returns a new rule instance
 func NewFabricMirroredDatabaseInvalidDescription() *FabricMirroredDatabaseInvalidDescription {
-	return &FabricMirroredDatabaseInvalidDescription{
-		resourceType:  "fabric_mirrored_database",
-		attributeName: "description",
-
-		maxLength: 256,
-	}
+	return &FabricMirroredDatabaseInvalidDescription{}
 }
 
-// Name returns the rule name
 func (r *FabricMirroredDatabaseInvalidDescription) Name() string {
 	return "fabric_mirrored_database_invalid_description"
 }
-
-// Enabled returns whether the rule is enabled by default
-func (r *FabricMirroredDatabaseInvalidDescription) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *FabricMirroredDatabaseInvalidDescription) Severity() tflint.Severity {
-	return tflint.ERROR
-}
-
-// Link returns the rule reference link
+func (r *FabricMirroredDatabaseInvalidDescription) Enabled() bool             { return true }
+func (r *FabricMirroredDatabaseInvalidDescription) Severity() tflint.Severity { return tflint.ERROR }
 func (r *FabricMirroredDatabaseInvalidDescription) Link() string {
-	return project.ReferenceLink(r.Name())
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/mirroredDatabase/definitions.json"
 }
 
-// Check validates the resource
 func (r *FabricMirroredDatabaseInvalidDescription) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent(r.resourceType, &hclext.BodySchema{
-		Attributes: []hclext.AttributeSchema{
-			{Name: r.attributeName},
+	content, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+				Body: &hclext.BodySchema{
+					Attributes: []hclext.AttributeSchema{
+						{Name: "description"},
+					},
+				},
+			},
 		},
 	}, nil)
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources.Blocks {
-		attribute, exists := resource.Body.Attributes[r.attributeName]
-		if !exists {
+	for _, block := range content.Blocks {
+		if block.Labels[0] != "fabric_mirrored_database" {
+			continue
+		}
+		attr, ok := block.Body.Attributes["description"]
+		if !ok {
 			continue
 		}
 
-		var val string
-		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
-		if err != nil {
-			return err
+		var v string
+		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
+			continue
 		}
-
-		if len(val) > r.maxLength {
-			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("description must be at most %d characters (actual: %d)", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			)
+		if len(v) > 256 {
+			if err := runner.EmitIssue(r,
+				fmt.Sprintf("%s exceeds max length %d", "description", 256),
+				attr.Expr.Range()); err != nil {
+				return err
+			}
 		}
-
+		// TODO: add pattern/enum checks if needed
 	}
 
 	return nil
