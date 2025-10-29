@@ -314,8 +314,8 @@ func GetGeneratedRules() map[string]GeneratedRuleInfo {
 		},
 		{
 			Name:        "fabric_eventhouse_invalid_format",
-			Type:        "FabricEventHouseInvalidFormat",
-			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricEventHouseInvalidFormat() },
+			Type:        "FabricEventhouseInvalidFormat",
+			Constructor: func() interface{ Check(tflint.Runner) error } { return NewFabricEventhouseInvalidFormat() },
 		},
 		{
 			Name:        "fabric_folder_invalid_parent_folder_id",
