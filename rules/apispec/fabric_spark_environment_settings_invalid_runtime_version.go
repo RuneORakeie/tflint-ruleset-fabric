@@ -11,32 +11,38 @@ import (
 
 type FabricSparkEnvironmentSettingsInvalidRuntimeVersion struct{ tflint.DefaultRule }
 
-func NewFabricSparkEnvironmentSettingsInvalidRuntimeVersion() *FabricSparkEnvironmentSettingsInvalidRuntimeVersion { return &FabricSparkEnvironmentSettingsInvalidRuntimeVersion{} }
+func NewFabricSparkEnvironmentSettingsInvalidRuntimeVersion() *FabricSparkEnvironmentSettingsInvalidRuntimeVersion {
+	return &FabricSparkEnvironmentSettingsInvalidRuntimeVersion{}
+}
 
-func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Name() string    { return "fabric_spark_environment_settings_invalid_runtime_version" }
-func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Enabled() bool   { return true }
-func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Severity() string{ return tflint.ERROR }
-func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/environment/definitions.json" }
+func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Name() string {
+	return "fabric_spark_environment_settings_invalid_runtime_version"
+}
+func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Enabled() bool    { return true }
+func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Severity() string { return tflint.ERROR }
+func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/environment/definitions.json"
+}
 
 func (r *FabricSparkEnvironmentSettingsInvalidRuntimeVersion) Check(runner tflint.Runner) error {
 	resourceType := "fabric_spark_environment_settings"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "runtime_version"
+	blockType := "" // empty string when not a nested block
+	attrName := "runtime_version"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"1.1","1.2","1.3", }
+	enum := []string{"1.1", "1.2", "1.3"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

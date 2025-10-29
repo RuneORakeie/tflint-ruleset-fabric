@@ -11,32 +11,38 @@ import (
 
 type FabricEventhouseInvalidDescription struct{ tflint.DefaultRule }
 
-func NewFabricEventhouseInvalidDescription() *FabricEventhouseInvalidDescription { return &FabricEventhouseInvalidDescription{} }
+func NewFabricEventhouseInvalidDescription() *FabricEventhouseInvalidDescription {
+	return &FabricEventhouseInvalidDescription{}
+}
 
-func (r *FabricEventhouseInvalidDescription) Name() string    { return "fabric_eventhouse_invalid_description" }
-func (r *FabricEventhouseInvalidDescription) Enabled() bool   { return true }
-func (r *FabricEventhouseInvalidDescription) Severity() string{ return tflint.ERROR }
-func (r *FabricEventhouseInvalidDescription) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventhouse/definitions.json" }
+func (r *FabricEventhouseInvalidDescription) Name() string {
+	return "fabric_eventhouse_invalid_description"
+}
+func (r *FabricEventhouseInvalidDescription) Enabled() bool    { return true }
+func (r *FabricEventhouseInvalidDescription) Severity() string { return tflint.ERROR }
+func (r *FabricEventhouseInvalidDescription) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventhouse/definitions.json"
+}
 
 func (r *FabricEventhouseInvalidDescription) Check(runner tflint.Runner) error {
 	resourceType := "fabric_eventhouse"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "description"
+	blockType := "" // empty string when not a nested block
+	attrName := "description"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 1024
+	maxLen := 1024
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

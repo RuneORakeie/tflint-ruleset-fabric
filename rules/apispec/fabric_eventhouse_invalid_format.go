@@ -11,32 +11,36 @@ import (
 
 type FabricEventhouseInvalidFormat struct{ tflint.DefaultRule }
 
-func NewFabricEventhouseInvalidFormat() *FabricEventhouseInvalidFormat { return &FabricEventhouseInvalidFormat{} }
+func NewFabricEventhouseInvalidFormat() *FabricEventhouseInvalidFormat {
+	return &FabricEventhouseInvalidFormat{}
+}
 
-func (r *FabricEventhouseInvalidFormat) Name() string    { return "fabric_eventhouse_invalid_format" }
-func (r *FabricEventhouseInvalidFormat) Enabled() bool   { return true }
-func (r *FabricEventhouseInvalidFormat) Severity() string{ return tflint.ERROR }
-func (r *FabricEventhouseInvalidFormat) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventhouse/definitions.json" }
+func (r *FabricEventhouseInvalidFormat) Name() string     { return "fabric_eventhouse_invalid_format" }
+func (r *FabricEventhouseInvalidFormat) Enabled() bool    { return true }
+func (r *FabricEventhouseInvalidFormat) Severity() string { return tflint.ERROR }
+func (r *FabricEventhouseInvalidFormat) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventhouse/definitions.json"
+}
 
 func (r *FabricEventhouseInvalidFormat) Check(runner tflint.Runner) error {
 	resourceType := "fabric_eventhouse"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "format"
+	blockType := "" // empty string when not a nested block
+	attrName := "format"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"Default", }
+	enum := []string{"Default"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

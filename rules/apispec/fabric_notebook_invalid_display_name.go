@@ -11,32 +11,38 @@ import (
 
 type FabricNotebookInvalidDisplayName struct{ tflint.DefaultRule }
 
-func NewFabricNotebookInvalidDisplayName() *FabricNotebookInvalidDisplayName { return &FabricNotebookInvalidDisplayName{} }
+func NewFabricNotebookInvalidDisplayName() *FabricNotebookInvalidDisplayName {
+	return &FabricNotebookInvalidDisplayName{}
+}
 
-func (r *FabricNotebookInvalidDisplayName) Name() string    { return "fabric_notebook_invalid_display_name" }
-func (r *FabricNotebookInvalidDisplayName) Enabled() bool   { return true }
-func (r *FabricNotebookInvalidDisplayName) Severity() string{ return tflint.ERROR }
-func (r *FabricNotebookInvalidDisplayName) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/notebook/definitions.json" }
+func (r *FabricNotebookInvalidDisplayName) Name() string {
+	return "fabric_notebook_invalid_display_name"
+}
+func (r *FabricNotebookInvalidDisplayName) Enabled() bool    { return true }
+func (r *FabricNotebookInvalidDisplayName) Severity() string { return tflint.ERROR }
+func (r *FabricNotebookInvalidDisplayName) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/notebook/definitions.json"
+}
 
 func (r *FabricNotebookInvalidDisplayName) Check(runner tflint.Runner) error {
 	resourceType := "fabric_notebook"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "display_name"
+	blockType := "" // empty string when not a nested block
+	attrName := "display_name"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 256
+	maxLen := 256
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

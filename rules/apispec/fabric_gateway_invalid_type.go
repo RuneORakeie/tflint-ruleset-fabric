@@ -13,30 +13,32 @@ type FabricGatewayInvalidType struct{ tflint.DefaultRule }
 
 func NewFabricGatewayInvalidType() *FabricGatewayInvalidType { return &FabricGatewayInvalidType{} }
 
-func (r *FabricGatewayInvalidType) Name() string    { return "fabric_gateway_invalid_type" }
-func (r *FabricGatewayInvalidType) Enabled() bool   { return true }
-func (r *FabricGatewayInvalidType) Severity() string{ return tflint.ERROR }
-func (r *FabricGatewayInvalidType) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/gateways.json" }
+func (r *FabricGatewayInvalidType) Name() string     { return "fabric_gateway_invalid_type" }
+func (r *FabricGatewayInvalidType) Enabled() bool    { return true }
+func (r *FabricGatewayInvalidType) Severity() string { return tflint.ERROR }
+func (r *FabricGatewayInvalidType) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/gateways.json"
+}
 
 func (r *FabricGatewayInvalidType) Check(runner tflint.Runner) error {
 	resourceType := "fabric_gateway"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "type"
+	blockType := "" // empty string when not a nested block
+	attrName := "type"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"VirtualNetwork", }
+	enum := []string{"VirtualNetwork"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

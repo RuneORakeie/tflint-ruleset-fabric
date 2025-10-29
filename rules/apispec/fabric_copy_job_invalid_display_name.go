@@ -11,32 +11,38 @@ import (
 
 type FabricCopyJobInvalidDisplayName struct{ tflint.DefaultRule }
 
-func NewFabricCopyJobInvalidDisplayName() *FabricCopyJobInvalidDisplayName { return &FabricCopyJobInvalidDisplayName{} }
+func NewFabricCopyJobInvalidDisplayName() *FabricCopyJobInvalidDisplayName {
+	return &FabricCopyJobInvalidDisplayName{}
+}
 
-func (r *FabricCopyJobInvalidDisplayName) Name() string    { return "fabric_copy_job_invalid_display_name" }
-func (r *FabricCopyJobInvalidDisplayName) Enabled() bool   { return true }
-func (r *FabricCopyJobInvalidDisplayName) Severity() string{ return tflint.ERROR }
-func (r *FabricCopyJobInvalidDisplayName) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/copyJob/definitions.json" }
+func (r *FabricCopyJobInvalidDisplayName) Name() string {
+	return "fabric_copy_job_invalid_display_name"
+}
+func (r *FabricCopyJobInvalidDisplayName) Enabled() bool    { return true }
+func (r *FabricCopyJobInvalidDisplayName) Severity() string { return tflint.ERROR }
+func (r *FabricCopyJobInvalidDisplayName) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/copyJob/definitions.json"
+}
 
 func (r *FabricCopyJobInvalidDisplayName) Check(runner tflint.Runner) error {
 	resourceType := "fabric_copy_job"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "display_name"
+	blockType := "" // empty string when not a nested block
+	attrName := "display_name"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 256
+	maxLen := 256
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

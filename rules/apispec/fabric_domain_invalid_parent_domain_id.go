@@ -11,32 +11,38 @@ import (
 
 type FabricDomainInvalidParentDomainID struct{ tflint.DefaultRule }
 
-func NewFabricDomainInvalidParentDomainID() *FabricDomainInvalidParentDomainID { return &FabricDomainInvalidParentDomainID{} }
+func NewFabricDomainInvalidParentDomainID() *FabricDomainInvalidParentDomainID {
+	return &FabricDomainInvalidParentDomainID{}
+}
 
-func (r *FabricDomainInvalidParentDomainID) Name() string    { return "fabric_domain_invalid_parent_domain_id" }
-func (r *FabricDomainInvalidParentDomainID) Enabled() bool   { return true }
-func (r *FabricDomainInvalidParentDomainID) Severity() string{ return tflint.ERROR }
-func (r *FabricDomainInvalidParentDomainID) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/admin/definitions/domains.json" }
+func (r *FabricDomainInvalidParentDomainID) Name() string {
+	return "fabric_domain_invalid_parent_domain_id"
+}
+func (r *FabricDomainInvalidParentDomainID) Enabled() bool    { return true }
+func (r *FabricDomainInvalidParentDomainID) Severity() string { return tflint.ERROR }
+func (r *FabricDomainInvalidParentDomainID) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/admin/definitions/domains.json"
+}
 
 func (r *FabricDomainInvalidParentDomainID) Check(runner tflint.Runner) error {
 	resourceType := "fabric_domain"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "parent_domain_id"
+	blockType := "" // empty string when not a nested block
+	attrName := "parent_domain_id"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

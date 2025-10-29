@@ -11,32 +11,38 @@ import (
 
 type FabricVariableLibraryInvalidDescription struct{ tflint.DefaultRule }
 
-func NewFabricVariableLibraryInvalidDescription() *FabricVariableLibraryInvalidDescription { return &FabricVariableLibraryInvalidDescription{} }
+func NewFabricVariableLibraryInvalidDescription() *FabricVariableLibraryInvalidDescription {
+	return &FabricVariableLibraryInvalidDescription{}
+}
 
-func (r *FabricVariableLibraryInvalidDescription) Name() string    { return "fabric_variable_library_invalid_description" }
-func (r *FabricVariableLibraryInvalidDescription) Enabled() bool   { return true }
-func (r *FabricVariableLibraryInvalidDescription) Severity() string{ return tflint.ERROR }
-func (r *FabricVariableLibraryInvalidDescription) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/variableLibrary/definitions.json" }
+func (r *FabricVariableLibraryInvalidDescription) Name() string {
+	return "fabric_variable_library_invalid_description"
+}
+func (r *FabricVariableLibraryInvalidDescription) Enabled() bool    { return true }
+func (r *FabricVariableLibraryInvalidDescription) Severity() string { return tflint.ERROR }
+func (r *FabricVariableLibraryInvalidDescription) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/variableLibrary/definitions.json"
+}
 
 func (r *FabricVariableLibraryInvalidDescription) Check(runner tflint.Runner) error {
 	resourceType := "fabric_variable_library"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "description"
+	blockType := "" // empty string when not a nested block
+	attrName := "description"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 256
+	maxLen := 256
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

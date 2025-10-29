@@ -11,32 +11,38 @@ import (
 
 type FabricConnectionInvalidConnectivityType struct{ tflint.DefaultRule }
 
-func NewFabricConnectionInvalidConnectivityType() *FabricConnectionInvalidConnectivityType { return &FabricConnectionInvalidConnectivityType{} }
+func NewFabricConnectionInvalidConnectivityType() *FabricConnectionInvalidConnectivityType {
+	return &FabricConnectionInvalidConnectivityType{}
+}
 
-func (r *FabricConnectionInvalidConnectivityType) Name() string    { return "fabric_connection_invalid_connectivity_type" }
-func (r *FabricConnectionInvalidConnectivityType) Enabled() bool   { return true }
-func (r *FabricConnectionInvalidConnectivityType) Severity() string{ return tflint.ERROR }
-func (r *FabricConnectionInvalidConnectivityType) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/connections.json" }
+func (r *FabricConnectionInvalidConnectivityType) Name() string {
+	return "fabric_connection_invalid_connectivity_type"
+}
+func (r *FabricConnectionInvalidConnectivityType) Enabled() bool    { return true }
+func (r *FabricConnectionInvalidConnectivityType) Severity() string { return tflint.ERROR }
+func (r *FabricConnectionInvalidConnectivityType) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/connections.json"
+}
 
 func (r *FabricConnectionInvalidConnectivityType) Check(runner tflint.Runner) error {
 	resourceType := "fabric_connection"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "connectivity_type"
+	blockType := "" // empty string when not a nested block
+	attrName := "connectivity_type"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"ShareableCloud","VirtualNetworkGateway", }
+	enum := []string{"ShareableCloud", "VirtualNetworkGateway"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

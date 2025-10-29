@@ -11,32 +11,38 @@ import (
 
 type FabricSparkEnvironmentSettingsInvalidDriverCores struct{ tflint.DefaultRule }
 
-func NewFabricSparkEnvironmentSettingsInvalidDriverCores() *FabricSparkEnvironmentSettingsInvalidDriverCores { return &FabricSparkEnvironmentSettingsInvalidDriverCores{} }
+func NewFabricSparkEnvironmentSettingsInvalidDriverCores() *FabricSparkEnvironmentSettingsInvalidDriverCores {
+	return &FabricSparkEnvironmentSettingsInvalidDriverCores{}
+}
 
-func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Name() string    { return "fabric_spark_environment_settings_invalid_driver_cores" }
-func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Enabled() bool   { return true }
-func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Severity() string{ return tflint.ERROR }
-func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/environment/definitions.json" }
+func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Name() string {
+	return "fabric_spark_environment_settings_invalid_driver_cores"
+}
+func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Enabled() bool    { return true }
+func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Severity() string { return tflint.ERROR }
+func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/environment/definitions.json"
+}
 
 func (r *FabricSparkEnvironmentSettingsInvalidDriverCores) Check(runner tflint.Runner) error {
 	resourceType := "fabric_spark_environment_settings"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "driver_cores"
+	blockType := "" // empty string when not a nested block
+	attrName := "driver_cores"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"4","8","16","32","64", }
+	enum := []string{"4", "8", "16", "32", "64"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

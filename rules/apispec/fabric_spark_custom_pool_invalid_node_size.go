@@ -11,32 +11,38 @@ import (
 
 type FabricSparkCustomPoolInvalidNodeSize struct{ tflint.DefaultRule }
 
-func NewFabricSparkCustomPoolInvalidNodeSize() *FabricSparkCustomPoolInvalidNodeSize { return &FabricSparkCustomPoolInvalidNodeSize{} }
+func NewFabricSparkCustomPoolInvalidNodeSize() *FabricSparkCustomPoolInvalidNodeSize {
+	return &FabricSparkCustomPoolInvalidNodeSize{}
+}
 
-func (r *FabricSparkCustomPoolInvalidNodeSize) Name() string    { return "fabric_spark_custom_pool_invalid_node_size" }
-func (r *FabricSparkCustomPoolInvalidNodeSize) Enabled() bool   { return true }
-func (r *FabricSparkCustomPoolInvalidNodeSize) Severity() string{ return tflint.ERROR }
-func (r *FabricSparkCustomPoolInvalidNodeSize) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/spark/definitions.json" }
+func (r *FabricSparkCustomPoolInvalidNodeSize) Name() string {
+	return "fabric_spark_custom_pool_invalid_node_size"
+}
+func (r *FabricSparkCustomPoolInvalidNodeSize) Enabled() bool    { return true }
+func (r *FabricSparkCustomPoolInvalidNodeSize) Severity() string { return tflint.ERROR }
+func (r *FabricSparkCustomPoolInvalidNodeSize) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/spark/definitions.json"
+}
 
 func (r *FabricSparkCustomPoolInvalidNodeSize) Check(runner tflint.Runner) error {
 	resourceType := "fabric_spark_custom_pool"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "node_size"
+	blockType := "" // empty string when not a nested block
+	attrName := "node_size"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"Small","Medium","Large","XLarge","XXLarge", }
+	enum := []string{"Small", "Medium", "Large", "XLarge", "XXLarge"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

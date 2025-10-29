@@ -11,32 +11,36 @@ import (
 
 type FabricDomainInvalidDisplayName struct{ tflint.DefaultRule }
 
-func NewFabricDomainInvalidDisplayName() *FabricDomainInvalidDisplayName { return &FabricDomainInvalidDisplayName{} }
+func NewFabricDomainInvalidDisplayName() *FabricDomainInvalidDisplayName {
+	return &FabricDomainInvalidDisplayName{}
+}
 
-func (r *FabricDomainInvalidDisplayName) Name() string    { return "fabric_domain_invalid_display_name" }
-func (r *FabricDomainInvalidDisplayName) Enabled() bool   { return true }
-func (r *FabricDomainInvalidDisplayName) Severity() string{ return tflint.ERROR }
-func (r *FabricDomainInvalidDisplayName) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/admin/definitions/domains.json" }
+func (r *FabricDomainInvalidDisplayName) Name() string     { return "fabric_domain_invalid_display_name" }
+func (r *FabricDomainInvalidDisplayName) Enabled() bool    { return true }
+func (r *FabricDomainInvalidDisplayName) Severity() string { return tflint.ERROR }
+func (r *FabricDomainInvalidDisplayName) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/admin/definitions/domains.json"
+}
 
 func (r *FabricDomainInvalidDisplayName) Check(runner tflint.Runner) error {
 	resourceType := "fabric_domain"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "display_name"
+	blockType := "" // empty string when not a nested block
+	attrName := "display_name"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 40
+	maxLen := 40
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

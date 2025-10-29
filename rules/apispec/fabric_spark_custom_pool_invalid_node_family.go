@@ -11,32 +11,38 @@ import (
 
 type FabricSparkCustomPoolInvalidNodeFamily struct{ tflint.DefaultRule }
 
-func NewFabricSparkCustomPoolInvalidNodeFamily() *FabricSparkCustomPoolInvalidNodeFamily { return &FabricSparkCustomPoolInvalidNodeFamily{} }
+func NewFabricSparkCustomPoolInvalidNodeFamily() *FabricSparkCustomPoolInvalidNodeFamily {
+	return &FabricSparkCustomPoolInvalidNodeFamily{}
+}
 
-func (r *FabricSparkCustomPoolInvalidNodeFamily) Name() string    { return "fabric_spark_custom_pool_invalid_node_family" }
-func (r *FabricSparkCustomPoolInvalidNodeFamily) Enabled() bool   { return true }
-func (r *FabricSparkCustomPoolInvalidNodeFamily) Severity() string{ return tflint.ERROR }
-func (r *FabricSparkCustomPoolInvalidNodeFamily) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/spark/definitions.json" }
+func (r *FabricSparkCustomPoolInvalidNodeFamily) Name() string {
+	return "fabric_spark_custom_pool_invalid_node_family"
+}
+func (r *FabricSparkCustomPoolInvalidNodeFamily) Enabled() bool    { return true }
+func (r *FabricSparkCustomPoolInvalidNodeFamily) Severity() string { return tflint.ERROR }
+func (r *FabricSparkCustomPoolInvalidNodeFamily) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/spark/definitions.json"
+}
 
 func (r *FabricSparkCustomPoolInvalidNodeFamily) Check(runner tflint.Runner) error {
 	resourceType := "fabric_spark_custom_pool"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "node_family"
+	blockType := "" // empty string when not a nested block
+	attrName := "node_family"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"MemoryOptimized", }
+	enum := []string{"MemoryOptimized"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

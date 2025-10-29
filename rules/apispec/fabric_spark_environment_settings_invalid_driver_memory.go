@@ -11,32 +11,38 @@ import (
 
 type FabricSparkEnvironmentSettingsInvalidDriverMemory struct{ tflint.DefaultRule }
 
-func NewFabricSparkEnvironmentSettingsInvalidDriverMemory() *FabricSparkEnvironmentSettingsInvalidDriverMemory { return &FabricSparkEnvironmentSettingsInvalidDriverMemory{} }
+func NewFabricSparkEnvironmentSettingsInvalidDriverMemory() *FabricSparkEnvironmentSettingsInvalidDriverMemory {
+	return &FabricSparkEnvironmentSettingsInvalidDriverMemory{}
+}
 
-func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Name() string    { return "fabric_spark_environment_settings_invalid_driver_memory" }
-func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Enabled() bool   { return true }
-func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Severity() string{ return tflint.ERROR }
-func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/environment/definitions.json" }
+func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Name() string {
+	return "fabric_spark_environment_settings_invalid_driver_memory"
+}
+func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Enabled() bool    { return true }
+func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Severity() string { return tflint.ERROR }
+func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/environment/definitions.json"
+}
 
 func (r *FabricSparkEnvironmentSettingsInvalidDriverMemory) Check(runner tflint.Runner) error {
 	resourceType := "fabric_spark_environment_settings"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "driver_memory"
+	blockType := "" // empty string when not a nested block
+	attrName := "driver_memory"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"28g","56g","112g","224g","400g", }
+	enum := []string{"28g", "56g", "112g", "224g", "400g"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

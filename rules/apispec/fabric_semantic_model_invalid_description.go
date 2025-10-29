@@ -11,32 +11,38 @@ import (
 
 type FabricSemanticModelInvalidDescription struct{ tflint.DefaultRule }
 
-func NewFabricSemanticModelInvalidDescription() *FabricSemanticModelInvalidDescription { return &FabricSemanticModelInvalidDescription{} }
+func NewFabricSemanticModelInvalidDescription() *FabricSemanticModelInvalidDescription {
+	return &FabricSemanticModelInvalidDescription{}
+}
 
-func (r *FabricSemanticModelInvalidDescription) Name() string    { return "fabric_semantic_model_invalid_description" }
-func (r *FabricSemanticModelInvalidDescription) Enabled() bool   { return true }
-func (r *FabricSemanticModelInvalidDescription) Severity() string{ return tflint.ERROR }
-func (r *FabricSemanticModelInvalidDescription) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/semanticModel/definitions.json" }
+func (r *FabricSemanticModelInvalidDescription) Name() string {
+	return "fabric_semantic_model_invalid_description"
+}
+func (r *FabricSemanticModelInvalidDescription) Enabled() bool    { return true }
+func (r *FabricSemanticModelInvalidDescription) Severity() string { return tflint.ERROR }
+func (r *FabricSemanticModelInvalidDescription) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/semanticModel/definitions.json"
+}
 
 func (r *FabricSemanticModelInvalidDescription) Check(runner tflint.Runner) error {
 	resourceType := "fabric_semantic_model"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "description"
+	blockType := "" // empty string when not a nested block
+	attrName := "description"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 256
+	maxLen := 256
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

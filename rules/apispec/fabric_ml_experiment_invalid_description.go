@@ -11,32 +11,38 @@ import (
 
 type FabricMlExperimentInvalidDescription struct{ tflint.DefaultRule }
 
-func NewFabricMlExperimentInvalidDescription() *FabricMlExperimentInvalidDescription { return &FabricMlExperimentInvalidDescription{} }
+func NewFabricMlExperimentInvalidDescription() *FabricMlExperimentInvalidDescription {
+	return &FabricMlExperimentInvalidDescription{}
+}
 
-func (r *FabricMlExperimentInvalidDescription) Name() string    { return "fabric_ml_experiment_invalid_description" }
-func (r *FabricMlExperimentInvalidDescription) Enabled() bool   { return true }
-func (r *FabricMlExperimentInvalidDescription) Severity() string{ return tflint.ERROR }
-func (r *FabricMlExperimentInvalidDescription) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/mlExperiment/definitions.json" }
+func (r *FabricMlExperimentInvalidDescription) Name() string {
+	return "fabric_ml_experiment_invalid_description"
+}
+func (r *FabricMlExperimentInvalidDescription) Enabled() bool    { return true }
+func (r *FabricMlExperimentInvalidDescription) Severity() string { return tflint.ERROR }
+func (r *FabricMlExperimentInvalidDescription) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/mlExperiment/definitions.json"
+}
 
 func (r *FabricMlExperimentInvalidDescription) Check(runner tflint.Runner) error {
 	resourceType := "fabric_ml_experiment"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "description"
+	blockType := "" // empty string when not a nested block
+	attrName := "description"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 256
+	maxLen := 256
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

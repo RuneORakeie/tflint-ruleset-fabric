@@ -11,32 +11,36 @@ import (
 
 type FabricFolderInvalidDisplayName struct{ tflint.DefaultRule }
 
-func NewFabricFolderInvalidDisplayName() *FabricFolderInvalidDisplayName { return &FabricFolderInvalidDisplayName{} }
+func NewFabricFolderInvalidDisplayName() *FabricFolderInvalidDisplayName {
+	return &FabricFolderInvalidDisplayName{}
+}
 
-func (r *FabricFolderInvalidDisplayName) Name() string    { return "fabric_folder_invalid_display_name" }
-func (r *FabricFolderInvalidDisplayName) Enabled() bool   { return true }
-func (r *FabricFolderInvalidDisplayName) Severity() string{ return tflint.ERROR }
-func (r *FabricFolderInvalidDisplayName) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/platform.json" }
+func (r *FabricFolderInvalidDisplayName) Name() string     { return "fabric_folder_invalid_display_name" }
+func (r *FabricFolderInvalidDisplayName) Enabled() bool    { return true }
+func (r *FabricFolderInvalidDisplayName) Severity() string { return tflint.ERROR }
+func (r *FabricFolderInvalidDisplayName) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/platform.json"
+}
 
 func (r *FabricFolderInvalidDisplayName) Check(runner tflint.Runner) error {
 	resourceType := "fabric_folder"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "display_name"
+	blockType := "" // empty string when not a nested block
+	attrName := "display_name"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 255
+	maxLen := 255
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

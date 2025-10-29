@@ -11,32 +11,38 @@ import (
 
 type FabricEventstreamInvalidDisplayName struct{ tflint.DefaultRule }
 
-func NewFabricEventstreamInvalidDisplayName() *FabricEventstreamInvalidDisplayName { return &FabricEventstreamInvalidDisplayName{} }
+func NewFabricEventstreamInvalidDisplayName() *FabricEventstreamInvalidDisplayName {
+	return &FabricEventstreamInvalidDisplayName{}
+}
 
-func (r *FabricEventstreamInvalidDisplayName) Name() string    { return "fabric_eventstream_invalid_display_name" }
-func (r *FabricEventstreamInvalidDisplayName) Enabled() bool   { return true }
-func (r *FabricEventstreamInvalidDisplayName) Severity() string{ return tflint.ERROR }
-func (r *FabricEventstreamInvalidDisplayName) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventstream/definitions.json" }
+func (r *FabricEventstreamInvalidDisplayName) Name() string {
+	return "fabric_eventstream_invalid_display_name"
+}
+func (r *FabricEventstreamInvalidDisplayName) Enabled() bool    { return true }
+func (r *FabricEventstreamInvalidDisplayName) Severity() string { return tflint.ERROR }
+func (r *FabricEventstreamInvalidDisplayName) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventstream/definitions.json"
+}
 
 func (r *FabricEventstreamInvalidDisplayName) Check(runner tflint.Runner) error {
 	resourceType := "fabric_eventstream"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "display_name"
+	blockType := "" // empty string when not a nested block
+	attrName := "display_name"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 256
+	maxLen := 256
 
-	pattern   := "^[a-zA-Z0-9._-]+$"
-	hasRegex  := len(pattern) > 0
+	pattern := "^[a-zA-Z0-9._-]+$"
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

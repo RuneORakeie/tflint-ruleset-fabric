@@ -11,32 +11,38 @@ import (
 
 type FabricConnectionInvalidDisplayName struct{ tflint.DefaultRule }
 
-func NewFabricConnectionInvalidDisplayName() *FabricConnectionInvalidDisplayName { return &FabricConnectionInvalidDisplayName{} }
+func NewFabricConnectionInvalidDisplayName() *FabricConnectionInvalidDisplayName {
+	return &FabricConnectionInvalidDisplayName{}
+}
 
-func (r *FabricConnectionInvalidDisplayName) Name() string    { return "fabric_connection_invalid_display_name" }
-func (r *FabricConnectionInvalidDisplayName) Enabled() bool   { return true }
-func (r *FabricConnectionInvalidDisplayName) Severity() string{ return tflint.ERROR }
-func (r *FabricConnectionInvalidDisplayName) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/connections.json" }
+func (r *FabricConnectionInvalidDisplayName) Name() string {
+	return "fabric_connection_invalid_display_name"
+}
+func (r *FabricConnectionInvalidDisplayName) Enabled() bool    { return true }
+func (r *FabricConnectionInvalidDisplayName) Severity() string { return tflint.ERROR }
+func (r *FabricConnectionInvalidDisplayName) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/connections.json"
+}
 
 func (r *FabricConnectionInvalidDisplayName) Check(runner tflint.Runner) error {
 	resourceType := "fabric_connection"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "display_name"
+	blockType := "" // empty string when not a nested block
+	attrName := "display_name"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 200
+	maxLen := 200
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

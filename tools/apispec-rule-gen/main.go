@@ -1,19 +1,19 @@
 package main
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
-	"path"
 	"text/template"
-	"bytes"
-  	"crypto/sha256"
 
 	hcl "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
@@ -25,10 +25,10 @@ type mappingFile struct {
 }
 
 type mapping struct {
-	Resource   string             `hcl:"resource,label"`
-	ImportPath string             `hcl:"import_path"`
-	Attributes []attributeMapping `hcl:"attribute,block"`
-	Constraints []constraint      `hcl:"constraint,block"`
+	Resource    string             `hcl:"resource,label"`
+	ImportPath  string             `hcl:"import_path"`
+	Attributes  []attributeMapping `hcl:"attribute,block"`
+	Constraints []constraint       `hcl:"constraint,block"`
 }
 
 type attributeMapping struct {
@@ -39,9 +39,9 @@ type attributeMapping struct {
 	Pattern      *string  `hcl:"pattern,optional"`
 	WarnOnExceed *bool    `hcl:"warn_on_exceed,optional"`
 	ValidValues  []string `hcl:"valid_values,optional"`
- 	KeyPattern   *string  `hcl:"key_pattern,optional"`
-	TypeHint     *string  `hcl:"type_hint,optional"`   // e.g. "uuid", "uri", "bool"
-	ReadOnly     *bool    `hcl:"read_only,optional"`   // force skip if true
+	KeyPattern   *string  `hcl:"key_pattern,optional"`
+	TypeHint     *string  `hcl:"type_hint,optional"` // e.g. "uuid", "uri", "bool"
+	ReadOnly     *bool    `hcl:"read_only,optional"` // force skip if true
 }
 
 type constraint struct {
@@ -49,6 +49,7 @@ type constraint struct {
 	OneOf   []string `hcl:"one_of,optional"`
 	Message string   `hcl:"message"`
 }
+
 // manualConstraint represents manually-added constraints in mapping files
 type manualConstraint struct {
 	MaxLength    *int     `hcl:"max_length,optional"`
@@ -74,9 +75,9 @@ type attributeRef struct {
 }
 
 type ChangeRecord struct {
-  Path   string
-  Status string // "created", "updated", "skipped"
-  Diff   string // for "updated" files
+	Path   string
+	Status string // "created", "updated", "skipped"
+	Diff   string // for "updated" files
 }
 
 var changeLog []ChangeRecord
@@ -301,39 +302,42 @@ func main() {
 
 	created, updated, skipped := 0, 0, 0
 	for _, c := range changeLog {
-	switch c.Status {
-	case "created": created++
-	case "updated": updated++
-	case "skipped": skipped++
-	}
+		switch c.Status {
+		case "created":
+			created++
+		case "updated":
+			updated++
+		case "skipped":
+			skipped++
+		}
 	}
 
 	fmt.Printf("\n=== Rule generation summary ===\n")
 	fmt.Printf("Created: %d  Updated: %d  Unchanged/Skipped: %d\n", created, updated, skipped)
 
 	if updated > 0 {
-	fmt.Println("\n-- Updated files (diffs) --")
-	for _, c := range changeLog {
-		if c.Status == "updated" {
-		fmt.Printf("\n[%s]\n%s\n", c.Path, c.Diff)
+		fmt.Println("\n-- Updated files (diffs) --")
+		for _, c := range changeLog {
+			if c.Status == "updated" {
+				fmt.Printf("\n[%s]\n%s\n", c.Path, c.Diff)
+			}
 		}
-	}
 	}
 	if created > 0 {
-	fmt.Println("\n-- Created files --")
-	for _, c := range changeLog {
-		if c.Status == "created" {
-		fmt.Printf("  %s\n", c.Path)
+		fmt.Println("\n-- Created files --")
+		for _, c := range changeLog {
+			if c.Status == "created" {
+				fmt.Printf("  %s\n", c.Path)
+			}
 		}
-	}
 	}
 	if skipped > 0 {
-	fmt.Println("\n-- Unchanged (skipped write) --")
-	for _, c := range changeLog {
-		if c.Status == "skipped" {
-		fmt.Printf("  %s\n", c.Path)
+		fmt.Println("\n-- Unchanged (skipped write) --")
+		for _, c := range changeLog {
+			if c.Status == "skipped" {
+				fmt.Printf("  %s\n", c.Path)
+			}
 		}
-	}
 	}
 	fmt.Println("================================")
 }
@@ -490,7 +494,7 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 		ValidValues:  attr.ValidValues,
 		KeyPattern:   attr.KeyPattern,
 		TypeHint:     attr.TypeHint,
-		ReadOnly:     attr.ReadOnly,		
+		ReadOnly:     attr.ReadOnly,
 	}
 
 	// Check if we have valid constraints
@@ -568,7 +572,7 @@ func validMapping(definition map[string]interface{}, manualConstraints *manualCo
 		return false
 	case "boolean":
 		// allow boolean when manual pattern/enum provided
-		return true		
+		return true
 	default:
 		return false
 	}
@@ -786,10 +790,10 @@ func processConstraints(m mapping) {
 		}
 		ruleName := fmt.Sprintf("%s_constraint_%s", m.Resource, c.Name)
 		meta := &ruleMeta{
-			RuleName:   ruleName,
-			RuleNameCC: toCamelCase(ruleName),
+			RuleName:     ruleName,
+			RuleNameCC:   toCamelCase(ruleName),
 			ResourceType: m.Resource,
-			Pattern: strings.Join(c.OneOf, ","), // pass list via Pattern for template
+			Pattern:      strings.Join(c.OneOf, ","), // pass list via Pattern for template
 		}
 		if c.Message != "" {
 			meta.ReferenceURL = c.Message // reuse field to carry message into template
@@ -820,9 +824,13 @@ func resolveRef(baseDir string, node map[string]interface{}) map[string]interfac
 	}
 	full := filepath.Clean(filepath.Join(baseDir, file))
 	raw, err := os.ReadFile(full)
-	if err != nil { return node }
-	if err := json.Unmarshal(raw, &doc); err != nil { return node }
-	if ptr == "" { 
+	if err != nil {
+		return node
+	}
+	if err := json.Unmarshal(raw, &doc); err != nil {
+		return node
+	}
+	if ptr == "" {
 		if m, ok := doc["definitions"].(map[string]interface{}); ok {
 			return m
 		}
@@ -832,8 +840,14 @@ func resolveRef(baseDir string, node map[string]interface{}) map[string]interfac
 		cur := any(doc).(map[string]interface{})
 		for _, seg := range strings.Split(ptr[1:], "/") {
 			nxt, ok := cur[seg]
-			if !ok { return node }
-			if m, ok := nxt.(map[string]interface{}); ok { cur = m } else { return node }
+			if !ok {
+				return node
+			}
+			if m, ok := nxt.(map[string]interface{}); ok {
+				cur = m
+			} else {
+				return node
+			}
 		}
 		return cur
 	}
@@ -882,14 +896,18 @@ func numberExists(definition map[string]interface{}, key string) bool {
 
 func fetchString(definition map[string]interface{}, key string) string {
 	if v, ok := definition[key]; ok {
-		if s, ok := v.(string); ok { return s }
+		if s, ok := v.(string); ok {
+			return s
+		}
 	}
 	return ""
 }
 
 func fetchBool(definition map[string]interface{}, key string) bool {
 	if v, ok := definition[key]; ok {
-		if b, ok := v.(bool); ok { return b }
+		if b, ok := v.(bool); ok {
+			return b
+		}
 	}
 	return false
 }
@@ -910,65 +928,78 @@ func fetchStrings(definition map[string]interface{}, key string) []string {
 }
 
 func generateFile(fileName string, tmplPath string, meta any) {
-  // parse template with helper funcs (needed by rule_xor.go.tmpl)
-  tmpl := template.Must(
-    template.New(path.Base(tmplPath)).
-      Funcs(template.FuncMap{
-        "split": strings.Split,
-        "join":  strings.Join,
-      }).
-      ParseFiles(tmplPath),
-  )
+	// parse template with helper funcs (needed by rule_xor.go.tmpl)
+	tmpl := template.Must(
+		template.New(path.Base(tmplPath)).
+			Funcs(template.FuncMap{
+				"split": strings.Split,
+				"join":  strings.Join,
+			}).
+			ParseFiles(tmplPath),
+	)
 
-  // render to memory
-  var buf bytes.Buffer
-  if err := tmpl.Execute(&buf, meta); err != nil {
-    panic(err)
-  }
-  newContent := buf.Bytes()
+	// render to memory
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, meta); err != nil {
+		panic(err)
+	}
+	newContent := buf.Bytes()
 
-  // read old file if exists
-  oldContent, _ := os.ReadFile(fileName)
-  same := len(oldContent) > 0 && sha256.Sum256(oldContent) == sha256.Sum256(newContent)
+	// read old file if exists
+	oldContent, _ := os.ReadFile(fileName)
+	same := len(oldContent) > 0 && sha256.Sum256(oldContent) == sha256.Sum256(newContent)
 
-  if same {
-    changeLog = append(changeLog, ChangeRecord{Path: fileName, Status: "skipped"})
-    return
-  }
+	if same {
+		changeLog = append(changeLog, ChangeRecord{Path: fileName, Status: "skipped"})
+		return
+	}
 
-  if err := os.MkdirAll(filepath.Dir(fileName), 0o755); err != nil {
-    panic(err)
-  }
-  if err := os.WriteFile(fileName, newContent, 0o644); err != nil {
-    panic(err)
-  }
+	if err := os.MkdirAll(filepath.Dir(fileName), 0o755); err != nil {
+		panic(err)
+	}
+	if err := os.WriteFile(fileName, newContent, 0o644); err != nil {
+		panic(err)
+	}
 
-  if len(oldContent) == 0 {
-    changeLog = append(changeLog, ChangeRecord{Path: fileName, Status: "created"})
-  } else {
-    changeLog = append(changeLog, ChangeRecord{
-      Path:   fileName,
-      Status: "updated",
-      Diff:   quickLineDiff(string(oldContent), string(newContent), 200),
-    })
-  }
+	if len(oldContent) == 0 {
+		changeLog = append(changeLog, ChangeRecord{Path: fileName, Status: "created"})
+	} else {
+		changeLog = append(changeLog, ChangeRecord{
+			Path:   fileName,
+			Status: "updated",
+			Diff:   quickLineDiff(string(oldContent), string(newContent), 200),
+		})
+	}
 }
 
 func quickLineDiff(a, b string, max int) string {
-  as := strings.Split(a, "\n")
-  bs := strings.Split(b, "\n")
-  var out strings.Builder
-  i, j, shown := 0, 0, 0
-  for i < len(as) && j < len(bs) {
-    if as[i] == bs[j] { i++; j++; continue }
-    if shown >= max { out.WriteString("... (diff truncated)\n"); break }
-    out.WriteString("- " + as[i] + "\n")
-    out.WriteString("+ " + bs[j] + "\n")
-    i++; j++; shown++
-  }
-  for ; shown < max && i < len(as); i, shown = i+1, shown+1 { out.WriteString("- " + as[i] + "\n") }
-  for ; shown < max && j < len(bs); j, shown = j+1, shown+1 { out.WriteString("+ " + bs[j] + "\n") }
-  return out.String()
+	as := strings.Split(a, "\n")
+	bs := strings.Split(b, "\n")
+	var out strings.Builder
+	i, j, shown := 0, 0, 0
+	for i < len(as) && j < len(bs) {
+		if as[i] == bs[j] {
+			i++
+			j++
+			continue
+		}
+		if shown >= max {
+			out.WriteString("... (diff truncated)\n")
+			break
+		}
+		out.WriteString("- " + as[i] + "\n")
+		out.WriteString("+ " + bs[j] + "\n")
+		i++
+		j++
+		shown++
+	}
+	for ; shown < max && i < len(as); i, shown = i+1, shown+1 {
+		out.WriteString("- " + as[i] + "\n")
+	}
+	for ; shown < max && j < len(bs); j, shown = j+1, shown+1 {
+		out.WriteString("+ " + bs[j] + "\n")
+	}
+	return out.String()
 }
 
 var heading = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")

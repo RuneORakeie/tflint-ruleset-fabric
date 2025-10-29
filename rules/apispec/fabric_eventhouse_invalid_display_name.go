@@ -11,32 +11,38 @@ import (
 
 type FabricEventhouseInvalidDisplayName struct{ tflint.DefaultRule }
 
-func NewFabricEventhouseInvalidDisplayName() *FabricEventhouseInvalidDisplayName { return &FabricEventhouseInvalidDisplayName{} }
+func NewFabricEventhouseInvalidDisplayName() *FabricEventhouseInvalidDisplayName {
+	return &FabricEventhouseInvalidDisplayName{}
+}
 
-func (r *FabricEventhouseInvalidDisplayName) Name() string    { return "fabric_eventhouse_invalid_display_name" }
-func (r *FabricEventhouseInvalidDisplayName) Enabled() bool   { return true }
-func (r *FabricEventhouseInvalidDisplayName) Severity() string{ return tflint.ERROR }
-func (r *FabricEventhouseInvalidDisplayName) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventhouse/definitions.json" }
+func (r *FabricEventhouseInvalidDisplayName) Name() string {
+	return "fabric_eventhouse_invalid_display_name"
+}
+func (r *FabricEventhouseInvalidDisplayName) Enabled() bool    { return true }
+func (r *FabricEventhouseInvalidDisplayName) Severity() string { return tflint.ERROR }
+func (r *FabricEventhouseInvalidDisplayName) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/eventhouse/definitions.json"
+}
 
 func (r *FabricEventhouseInvalidDisplayName) Check(runner tflint.Runner) error {
 	resourceType := "fabric_eventhouse"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "display_name"
+	blockType := "" // empty string when not a nested block
+	attrName := "display_name"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 256
+	maxLen := 256
 
-	pattern   := "^[a-zA-Z0-9._-]+$"
-	hasRegex  := len(pattern) > 0
+	pattern := "^[a-zA-Z0-9._-]+$"
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

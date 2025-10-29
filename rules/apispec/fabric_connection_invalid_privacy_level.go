@@ -11,32 +11,38 @@ import (
 
 type FabricConnectionInvalidPrivacyLevel struct{ tflint.DefaultRule }
 
-func NewFabricConnectionInvalidPrivacyLevel() *FabricConnectionInvalidPrivacyLevel { return &FabricConnectionInvalidPrivacyLevel{} }
+func NewFabricConnectionInvalidPrivacyLevel() *FabricConnectionInvalidPrivacyLevel {
+	return &FabricConnectionInvalidPrivacyLevel{}
+}
 
-func (r *FabricConnectionInvalidPrivacyLevel) Name() string    { return "fabric_connection_invalid_privacy_level" }
-func (r *FabricConnectionInvalidPrivacyLevel) Enabled() bool   { return true }
-func (r *FabricConnectionInvalidPrivacyLevel) Severity() string{ return tflint.ERROR }
-func (r *FabricConnectionInvalidPrivacyLevel) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/connections.json" }
+func (r *FabricConnectionInvalidPrivacyLevel) Name() string {
+	return "fabric_connection_invalid_privacy_level"
+}
+func (r *FabricConnectionInvalidPrivacyLevel) Enabled() bool    { return true }
+func (r *FabricConnectionInvalidPrivacyLevel) Severity() string { return tflint.ERROR }
+func (r *FabricConnectionInvalidPrivacyLevel) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/connections.json"
+}
 
 func (r *FabricConnectionInvalidPrivacyLevel) Check(runner tflint.Runner) error {
 	resourceType := "fabric_connection"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "privacy_level"
+	blockType := "" // empty string when not a nested block
+	attrName := "privacy_level"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := false
-	maxLen    := 0
+	maxLen := 0
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{"None","Private","Organizational","Public", }
+	enum := []string{"None", "Private", "Organizational", "Public"}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks

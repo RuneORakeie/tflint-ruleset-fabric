@@ -11,32 +11,38 @@ import (
 
 type FabricDeploymentPipelineInvalidDescription struct{ tflint.DefaultRule }
 
-func NewFabricDeploymentPipelineInvalidDescription() *FabricDeploymentPipelineInvalidDescription { return &FabricDeploymentPipelineInvalidDescription{} }
+func NewFabricDeploymentPipelineInvalidDescription() *FabricDeploymentPipelineInvalidDescription {
+	return &FabricDeploymentPipelineInvalidDescription{}
+}
 
-func (r *FabricDeploymentPipelineInvalidDescription) Name() string    { return "fabric_deployment_pipeline_invalid_description" }
-func (r *FabricDeploymentPipelineInvalidDescription) Enabled() bool   { return true }
-func (r *FabricDeploymentPipelineInvalidDescription) Severity() string{ return tflint.ERROR }
-func (r *FabricDeploymentPipelineInvalidDescription) Link() string    { return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/deploymentPipelines.json" }
+func (r *FabricDeploymentPipelineInvalidDescription) Name() string {
+	return "fabric_deployment_pipeline_invalid_description"
+}
+func (r *FabricDeploymentPipelineInvalidDescription) Enabled() bool    { return true }
+func (r *FabricDeploymentPipelineInvalidDescription) Severity() string { return tflint.ERROR }
+func (r *FabricDeploymentPipelineInvalidDescription) Link() string {
+	return "https://github.com/microsoft/fabric-rest-api-specs/tree/main/platform/definitions/deploymentPipelines.json"
+}
 
 func (r *FabricDeploymentPipelineInvalidDescription) Check(runner tflint.Runner) error {
 	resourceType := "fabric_deployment_pipeline"
-	blockType    := ""     // empty string when not a nested block
-	attrName     := "description"
+	blockType := "" // empty string when not a nested block
+	attrName := "description"
 
 	// Constraints (presence controlled by Set* flags)
 	hasMinLen := false
-	minLen    := 0
+	minLen := 0
 	hasMaxLen := true
-	maxLen    := 1024
+	maxLen := 1024
 
-	pattern   := ""
-	hasRegex  := len(pattern) > 0
+	pattern := ""
+	hasRegex := len(pattern) > 0
 	var re *regexp.Regexp
 	if hasRegex {
 		re = regexp.MustCompile(pattern)
 	}
 
-	enum := []string{ }
+	enum := []string{}
 	hasEnum := len(enum) > 0
 
 	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks
