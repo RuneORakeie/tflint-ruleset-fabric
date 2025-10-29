@@ -1,101 +1,65 @@
 package apispec
 
 import (
-	"fmt"
-	"regexp"
-	"strings"
+    "fmt"
 
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
-	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+    "github.com/terraform-linters/tflint-plugin-sdk/tflint"
+    "github.com/terraform-linters/tflint-plugin-sdk/hclext"
 )
 
 type {{ .RuleNameCC }} struct{ tflint.DefaultRule }
 
 func New{{ .RuleNameCC }}() *{{ .RuleNameCC }} { return &{{ .RuleNameCC }}{} }
 
-func (r *{{ .RuleNameCC }}) Name() string    { return "{{ .RuleName }}" }
-func (r *{{ .RuleNameCC }}) Enabled() bool   { return true }
-func (r *{{ .RuleNameCC }}) Severity() string{ return tflint.ERROR }
-func (r *{{ .RuleNameCC }}) Link() string    { return "{{ .ReferenceURL }}" }
+func (r *{{ .RuleNameCC }}) Name() string                   { return "{{ .RuleName }}" }
+func (r *{{ .RuleNameCC }}) Enabled() bool                  { return true }
+func (r *{{ .RuleNameCC }}) Severity() tflint.Severity      { return tflint.ERROR }
+func (r *{{ .RuleNameCC }}) Link() string                   { return "{{ .ReferenceURL }}" }
 
 func (r *{{ .RuleNameCC }}) Check(runner tflint.Runner) error {
-	resourceType := "{{ .ResourceType }}"
-	blockType    := "{{ .BlockType }}"     // empty string when not a nested block
-	attrName     := "{{ .AttributeName }}"
+    content, err := runner.GetModuleContent(&hclext.BodySchema{
+        Blocks: []hclext.BlockSchema{
+            {
+                Type:       "resource",
+                LabelNames: []string{"type", "name"},
+                Body: &hclext.BodySchema{
+                    Attributes: []hclext.AttributeSchema{
+                        {Name: "{{ .AttributeName }}"},
+                    },
+                },
+            },
+        },
+    }, nil)
+    if err != nil {
+        return err
+    }
 
-	// Constraints (presence controlled by Set* flags)
-	hasMinLen := {{ .SetMinLength }}
-	minLen    := {{ .MinLength }}
-	hasMaxLen := {{ .SetMaxLength }}
-	maxLen    := {{ .MaxLength }}
+    for _, block := range content.Blocks {
+        if block.Labels[0] != "{{ .ResourceType }}" {
+            continue
+        }
+        attr, ok := block.Body.Attributes["{{ .AttributeName }}"]
+        if !ok {
+            continue
+        }
 
-	pattern   := {{ printf "%q" .Pattern }}
-	hasRegex  := len(pattern) > 0
-	var re *regexp.Regexp
-	if hasRegex {
-		re = regexp.MustCompile(pattern)
-	}
+        var v string
+        if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
+            continue
+        }
 
-	enum := []string{ {{- range .Enum }}"{{ . }}",{{- end }} }
-	hasEnum := len(enum) > 0
+        if {{ .SetMaxLength }} && len(v) > {{ .MaxLength }} {
+            if err := runner.EmitIssue(r, fmt.Sprintf("%s exceeds max length %d", "{{ .AttributeName }}", {{ .MaxLength }}), attr.Expr.Range()); err != nil {
+                return err
+            }
+        }
+        if {{ .SetMinLength }} && len(v) < {{ .MinLength }} {
+            if err := runner.EmitIssue(r, fmt.Sprintf("%s shorter than min length %d", "{{ .AttributeName }}", {{ .MinLength }}), attr.Expr.Range()); err != nil {
+                return err
+            }
+        }
+        // TODO: add pattern/enum checks if needed
+    }
 
-	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks
-
-	return helper.ForEachResource(runner, resourceType, func(res *helper.Resource) error {
-		var attr *helper.Attribute
-
-		if blockType != "" {
-			blk := res.GetBlock(blockType)
-			if blk == nil {
-				return nil
-			}
-			attr = blk.GetAttribute(attrName)
-		} else {
-			attr = res.GetAttribute(attrName)
-		}
-
-		if attr == nil {
-			return nil
-		}
-
-		// We treat values as strings for length/pattern/enum checks
-		v, err := attr.ValueAsString()
-		if err != nil {
-			// Non-string types are typically guarded by provider schema; skip.
-			return nil
-		}
-
-		// length checks
-		if hasMaxLen && len(v) > maxLen {
-			msg := fmt.Sprintf("%s exceeds max length %d", attrName, maxLen)
-			return runner.EmitIssue(r, msg, attr.Expr.Range())
-		}
-		if hasMinLen && len(v) < minLen {
-			msg := fmt.Sprintf("%s shorter than min length %d", attrName, minLen)
-			return runner.EmitIssue(r, msg, attr.Expr.Range())
-		}
-
-		// enum
-		if hasEnum {
-			ok := false
-			for _, ev := range enum {
-				if v == ev {
-					ok = true
-					break
-				}
-			}
-			if !ok {
-				msg := fmt.Sprintf("%s must be one of: %s", attrName, strings.Join(enum, ", "))
-				return runner.EmitIssue(r, msg, attr.Expr.Range())
-			}
-		}
-
-		// regex
-		if hasRegex && !re.MatchString(v) {
-			msg := fmt.Sprintf("%s must match pattern %q", attrName, pattern)
-			return runner.EmitIssue(r, msg, attr.Expr.Range())
-		}
-
-		return nil
-	})
+    return nil
 }

@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+	"go/format"
 
 	hcl "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
@@ -945,6 +946,13 @@ func generateFile(fileName string, tmplPath string, meta any) {
 	}
 	newContent := buf.Bytes()
 
+	// Format Go source files before comparing/writing
+	if strings.HasSuffix(fileName, ".go") {
+		if formatted, err := format.Source(newContent); err == nil {
+			newContent = formatted
+		}
+	}
+		
 	// read old file if exists
 	oldContent, _ := os.ReadFile(fileName)
 	same := len(oldContent) > 0 && sha256.Sum256(oldContent) == sha256.Sum256(newContent)
