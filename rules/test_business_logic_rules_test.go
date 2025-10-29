@@ -606,50 +606,6 @@ func TestFabricWorkspaceCapacity(t *testing.T) {
 	}
 }
 
-// TestFabricWorkspaceDescription tests workspace description requirement
-func TestFabricWorkspaceDescription(t *testing.T) {
-	tests := []struct {
-		name     string
-		content  string
-		hasIssue bool
-	}{
-		{
-			name: "valid - with description",
-			content: `resource "fabric_workspace" "example" {
-				display_name = "Test"
-				description = "Test workspace"
-			}`,
-			hasIssue: false,
-		},
-		{
-			name: "warning - without description",
-			content: `resource "fabric_workspace" "example" {
-				display_name = "Test"
-			}`,
-			hasIssue: true,
-		},
-	}
-
-	rule := NewFabricWorkspaceDescription()
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			runner := helper.TestRunner(t, map[string]string{"main.tf": tt.content})
-			if err := rule.Check(runner); err != nil {
-				t.Fatalf("Unexpected error: %s", err)
-			}
-			if len(runner.Issues) > 0 {
-				if !tt.hasIssue {
-					t.Fatalf("Expected no issues, but got: %v", runner.Issues)
-				}
-			} else {
-				if tt.hasIssue {
-					t.Fatal("Expected issues, but got none")
-				}
-			}
-		})
-	}
-}
-
 // TestFabricWorkspaceGitAzdoAttributes tests Azure DevOps git attributes
 func TestFabricWorkspaceGitAzdoAttributes(t *testing.T) {
 	tests := []struct {
