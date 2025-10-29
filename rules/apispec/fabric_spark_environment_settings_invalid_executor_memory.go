@@ -1,8 +1,6 @@
 package apispec
 
 import (
-	"fmt"
-
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
@@ -54,17 +52,6 @@ func (r *FabricSparkEnvironmentSettingsInvalidExecutorMemory) Check(runner tflin
 		var v string
 		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
 			continue
-		}
-
-		if false && len(v) > 0 {
-			if err := runner.EmitIssue(r, fmt.Sprintf("%s exceeds max length %d", "executor_memory", 0), attr.Expr.Range()); err != nil {
-				return err
-			}
-		}
-		if false && len(v) < 0 {
-			if err := runner.EmitIssue(r, fmt.Sprintf("%s shorter than min length %d", "executor_memory", 0), attr.Expr.Range()); err != nil {
-				return err
-			}
 		}
 		// TODO: add pattern/enum checks if needed
 	}

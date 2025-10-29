@@ -53,14 +53,10 @@ func (r *FabricDeploymentPipelineInvalidDisplayName) Check(runner tflint.Runner)
 		if err := runner.EvaluateExpr(attr.Expr, &v, nil); err != nil {
 			continue
 		}
-
-		if true && len(v) > 256 {
-			if err := runner.EmitIssue(r, fmt.Sprintf("%s exceeds max length %d", "display_name", 256), attr.Expr.Range()); err != nil {
-				return err
-			}
-		}
-		if false && len(v) < 0 {
-			if err := runner.EmitIssue(r, fmt.Sprintf("%s shorter than min length %d", "display_name", 0), attr.Expr.Range()); err != nil {
+		if len(v) > 256 {
+			if err := runner.EmitIssue(r,
+				fmt.Sprintf("%s exceeds max length %d", "display_name", 256),
+				attr.Expr.Range()); err != nil {
 				return err
 			}
 		}
