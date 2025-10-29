@@ -1,220 +1,101 @@
 package apispec
 
 import (
-{{ if or .SetMaxLength .SetMinLength .SetMax .SetMin .Enum }}	"fmt"
-{{ end }}{{ if .Pattern }}	"regexp"
-{{ end }}{{ if .Format }}	"time"
-	
-	"github.com/google/uuid"
-{{ end }}	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
+	"fmt"
+	"regexp"
+	"strings"
+
+	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
-	"github.com/RuneORakeie/tflint-ruleset-fabric/project"
 )
 
-// {{ .RuleNameCC }} checks whether {{ .ResourceType }}.{{ .AttributeName }} is valid
-type {{ .RuleNameCC }} struct {
-	tflint.DefaultRule
+type {{ .RuleNameCC }} struct{ tflint.DefaultRule }
 
-	resourceType  string
-	attributeName string
-{{ if .Enum }}	enum          []string{{ end }}
-{{ if .Pattern }}	pattern       string{{ end }}
-{{ if .Format }}	format        string{{ end }}
-{{ if .SetMax }}	max           int{{ end }}
-{{ if .SetMin }}	min           int{{ end }}
-{{ if .SetMaxLength }}	maxLength     int{{ end }}
-{{ if .SetMinLength }}	minLength     int{{ end }}
-{{ if .WarnOnExceed }}	warnOnExceed  bool{{ end }}
-{{ if .ReadOnly }}	readOnly      bool{{ end }}
-}
+func New{{ .RuleNameCC }}() *{{ .RuleNameCC }} { return &{{ .RuleNameCC }}{} }
 
-// NewFabricRule returns a new rule instance
-func New{{ .RuleNameCC }}() *{{ .RuleNameCC }} {
-	return &{{ .RuleNameCC }}{
-		resourceType:  "{{ .ResourceType }}",
-		attributeName: "{{ .AttributeName }}",
-{{ if .Enum }}		enum:          []string{ {{ range .Enum }}"{{ . }}", {{ end }} },{{ end }}
-{{ if .Pattern }}		pattern:       `{{ .Pattern }}`,{{ end }}
-{{ if .Format }}		format:        "{{ .Format }}",{{ end }}
-{{ if .SetMax }}		max:           {{ .Max }},{{ end }}
-{{ if .SetMin }}		min:           {{ .Min }},{{ end }}
-{{ if .SetMaxLength }}		maxLength:     {{ .MaxLength }},{{ end }}
-{{ if .SetMinLength }}		minLength:     {{ .MinLength }},{{ end }}
-{{ if .WarnOnExceed }}		warnOnExceed:  {{ .WarnOnExceed }},{{ end }}
-{{ if .ReadOnly }}		readOnly:      {{ .ReadOnly }},{{ end }}
-	}
-}
+func (r *{{ .RuleNameCC }}) Name() string    { return "{{ .RuleName }}" }
+func (r *{{ .RuleNameCC }}) Enabled() bool   { return true }
+func (r *{{ .RuleNameCC }}) Severity() string{ return tflint.ERROR }
+func (r *{{ .RuleNameCC }}) Link() string    { return "{{ .ReferenceURL }}" }
 
-// Name returns the rule name
-func (r *{{ .RuleNameCC }}) Name() string {
-	return "{{ .RuleName }}"
-}
-
-// Enabled returns whether the rule is enabled by default
-func (r *{{ .RuleNameCC }}) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *{{ .RuleNameCC }}) Severity() tflint.Severity {
-	return tflint.ERROR
-}
-
-// Link returns the rule reference link
-func (r *{{ .RuleNameCC }}) Link() string {
-	return project.ReferenceLink(r.Name())
-}
-
-// Check validates the resource
 func (r *{{ .RuleNameCC }}) Check(runner tflint.Runner) error {
-	resources, err := runner.GetResourceContent(r.resourceType, &hclext.BodySchema{
-		Attributes: []hclext.AttributeSchema{
-			{Name: r.attributeName},
-		},
-	}, nil)
-	if err != nil {
-		return err
+	resourceType := "{{ .ResourceType }}"
+	blockType    := "{{ .BlockType }}"     // empty string when not a nested block
+	attrName     := "{{ .AttributeName }}"
+
+	// Constraints (presence controlled by Set* flags)
+	hasMinLen := {{ .SetMinLength }}
+	minLen    := {{ .MinLength }}
+	hasMaxLen := {{ .SetMaxLength }}
+	maxLen    := {{ .MaxLength }}
+
+	pattern   := {{ printf "%q" .Pattern }}
+	hasRegex  := len(pattern) > 0
+	var re *regexp.Regexp
+	if hasRegex {
+		re = regexp.MustCompile(pattern)
 	}
 
-	for _, resource := range resources.Blocks {
-		attribute, exists := resource.Body.Attributes[r.attributeName]
-		if !exists {
-			continue
+	enum := []string{ {{- range .Enum }}"{{ . }}",{{- end }} }
+	hasEnum := len(enum) > 0
+
+	// NOTE: .Format (uuid, uri, date-time) and .WarnOnExceed are available if you later add format-specific checks
+
+	return helper.ForEachResource(runner, resourceType, func(res *helper.Resource) error {
+		var attr *helper.Attribute
+
+		if blockType != "" {
+			blk := res.GetBlock(blockType)
+			if blk == nil {
+				return nil
+			}
+			attr = blk.GetAttribute(attrName)
+		} else {
+			attr = res.GetAttribute(attrName)
 		}
 
-{{ if .Sensitive }}		// Sensitive attribute - skip validation
-		if r.isSensitive(attribute) {
-			continue
-		}
-{{ end }}
-		var val string
-		err := runner.EvaluateExpr(attribute.Expr, &val, nil)
-		if err != nil {
-			return err
-		}
-
-{{ if .Enum }}		if err := r.validateEnum(runner, val, attribute); err != nil {
-			return err
-		}
-{{ end }}
-{{ if .Pattern }}		if err := r.validatePattern(runner, val, attribute); err != nil {
-			return err
-		}
-{{ end }}
-{{ if .Format }}		if err := r.validateFormat(runner, val, attribute); err != nil {
-			return err
-		}
-{{ end }}
-{{ if .SetMaxLength }}		if len(val) > r.maxLength {
-{{ if .WarnOnExceed }}			if err := runner.EmitIssue(
-				r,
-				fmt.Sprintf("{{ .AttributeName }} exceeds maximum length of %d characters (actual: %d) - value will be truncated by the API", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			); err != nil {
-				return err
-			}
-{{ else }}			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("{{ .AttributeName }} must be at most %d characters (actual: %d)", r.maxLength, len(val)),
-				attribute.Expr.Range(),
-			)
-{{ end }}		}
-{{ end }}
-{{ if .SetMinLength }}		if len(val) < r.minLength {
-			return runner.EmitIssue(
-				r,
-				fmt.Sprintf("{{ .AttributeName }} must be at least %d characters (actual: %d)", r.minLength, len(val)),
-				attribute.Expr.Range(),
-			)
-		}
-{{ end }}
-{{ if .ReadOnly }}		if r.readOnly {
-			return runner.EmitIssue(
-				r,
-				"{{ .AttributeName }} is a read-only property and cannot be set",
-				attribute.Expr.Range(),
-			)
-		}
-{{ end }}
-{{ if or .SetMax .SetMin }}		var numVal {{ if eq .SetMax true }}int{{ else }}float64{{ end }}
-		if err := runner.EvaluateExpr(attribute.Expr, &numVal, nil); err == nil {
-{{ if .SetMax }}			if numVal > r.max {
-				return runner.EmitIssue(
-					r,
-					fmt.Sprintf("{{ .AttributeName }} must be at most %d", r.max),
-					attribute.Expr.Range(),
-				)
-			}
-{{ end }}
-{{ if .SetMin }}			if numVal < r.min {
-				return runner.EmitIssue(
-					r,
-					fmt.Sprintf("{{ .AttributeName }} must be at least %d", r.min),
-					attribute.Expr.Range(),
-				)
-			}
-{{ end }}		}
-{{ end }}	}
-
-	return nil
-}
-{{ if .Enum }}
-func (r *{{ .RuleNameCC }}) validateEnum(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
-	for _, valid := range r.enum {
-		if val == valid {
+		if attr == nil {
 			return nil
 		}
-	}
-	return runner.EmitIssue(
-		r,
-		fmt.Sprintf("{{ .AttributeName }} must be one of: %v", r.enum),
-		attribute.Expr.Range(),
-	)
-}
-{{ end }}
-{{ if .Pattern }}
-func (r *{{ .RuleNameCC }}) validatePattern(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
-	matched, err := regexp.MatchString(r.pattern, val)
-	if err != nil {
-		return err
-	}
-	if !matched {
-		return runner.EmitIssue(
-			r,
-			fmt.Sprintf("{{ .AttributeName }} does not match required pattern: %s", r.pattern),
-			attribute.Expr.Range(),
-		)
-	}
-	return nil
-}
-{{ end }}
-{{ if .Format }}
-func (r *{{ .RuleNameCC }}) validateFormat(runner tflint.Runner, val string, attribute *hclext.Attribute) error {
-	switch r.format {
-	case "uuid":
-		if _, err := uuid.Parse(val); err != nil {
-			return runner.EmitIssue(
-				r,
-				"{{ .AttributeName }} must be a valid UUID",
-				attribute.Expr.Range(),
-			)
+
+		// We treat values as strings for length/pattern/enum checks
+		v, err := attr.ValueAsString()
+		if err != nil {
+			// Non-string types are typically guarded by provider schema; skip.
+			return nil
 		}
-	case "date-time":
-		if _, err := time.Parse(time.RFC3339, val); err != nil {
-			return runner.EmitIssue(
-				r,
-				"{{ .AttributeName }} must be a valid RFC3339 date-time",
-				attribute.Expr.Range(),
-			)
+
+		// length checks
+		if hasMaxLen && len(v) > maxLen {
+			msg := fmt.Sprintf("%s exceeds max length %d", attrName, maxLen)
+			return runner.EmitIssue(r, msg, attr.Expr.Range())
 		}
-	}
-	return nil
+		if hasMinLen && len(v) < minLen {
+			msg := fmt.Sprintf("%s shorter than min length %d", attrName, minLen)
+			return runner.EmitIssue(r, msg, attr.Expr.Range())
+		}
+
+		// enum
+		if hasEnum {
+			ok := false
+			for _, ev := range enum {
+				if v == ev {
+					ok = true
+					break
+				}
+			}
+			if !ok {
+				msg := fmt.Sprintf("%s must be one of: %s", attrName, strings.Join(enum, ", "))
+				return runner.EmitIssue(r, msg, attr.Expr.Range())
+			}
+		}
+
+		// regex
+		if hasRegex && !re.MatchString(v) {
+			msg := fmt.Sprintf("%s must match pattern %q", attrName, pattern)
+			return runner.EmitIssue(r, msg, attr.Expr.Range())
+		}
+
+		return nil
+	})
 }
-{{ end }}
-{{ if .Sensitive }}
-func (r *{{ .RuleNameCC }}) isSensitive(attribute *hclext.Attribute) bool {
-	// Check if attribute is marked as sensitive in Terraform
-	// This is a simplified check - you may need to enhance this
-	return false
-}
-{{ end }}

@@ -10,7 +10,10 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"path"
 	"text/template"
+	"bytes"
+  	"crypto/sha256"
 
 	hcl "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
@@ -25,6 +28,7 @@ type mapping struct {
 	Resource   string             `hcl:"resource,label"`
 	ImportPath string             `hcl:"import_path"`
 	Attributes []attributeMapping `hcl:"attribute,block"`
+	Constraints []constraint      `hcl:"constraint,block"`
 }
 
 type attributeMapping struct {
@@ -35,8 +39,16 @@ type attributeMapping struct {
 	Pattern      *string  `hcl:"pattern,optional"`
 	WarnOnExceed *bool    `hcl:"warn_on_exceed,optional"`
 	ValidValues  []string `hcl:"valid_values,optional"`
+ 	KeyPattern   *string  `hcl:"key_pattern,optional"`
+	TypeHint     *string  `hcl:"type_hint,optional"`   // e.g. "uuid", "uri", "bool"
+	ReadOnly     *bool    `hcl:"read_only,optional"`   // force skip if true
 }
 
+type constraint struct {
+	Name    string   `hcl:"name,label"`
+	OneOf   []string `hcl:"one_of,optional"`
+	Message string   `hcl:"message"`
+}
 // manualConstraint represents manually-added constraints in mapping files
 type manualConstraint struct {
 	MaxLength    *int     `hcl:"max_length,optional"`
@@ -44,6 +56,9 @@ type manualConstraint struct {
 	Pattern      *string  `hcl:"pattern,optional"`
 	WarnOnExceed *bool    `hcl:"warn_on_exceed,optional"`
 	ValidValues  []string `hcl:"valid_values,optional"`
+	KeyPattern   *string  `hcl:"key_pattern,optional"`
+	TypeHint     *string  `hcl:"type_hint,optional"`
+	ReadOnly     *bool    `hcl:"read_only,optional"`
 }
 
 type apiSpec struct {
@@ -57,6 +72,14 @@ type attributeRef struct {
 	attribute string
 	value     hcl.Expression
 }
+
+type ChangeRecord struct {
+  Path   string
+  Status string // "created", "updated", "skipped"
+  Diff   string // for "updated" files
+}
+
+var changeLog []ChangeRecord
 
 func (r *attributeRef) String() string {
 	if r.block != nil {
@@ -258,6 +281,8 @@ func main() {
 			for _, attr := range mapping.Attributes {
 				processAttributeMapping(apiSpec, mapping, attr)
 			}
+			// Generate cross-attribute constraint rules
+			processConstraints(mapping)
 		}
 	}
 
@@ -273,6 +298,44 @@ func main() {
 	if len(orphanedMappings) > 0 {
 		fmt.Printf("\n⚠️  %d orphaned mapping files found (see warnings above)\n", len(orphanedMappings))
 	}
+
+	created, updated, skipped := 0, 0, 0
+	for _, c := range changeLog {
+	switch c.Status {
+	case "created": created++
+	case "updated": updated++
+	case "skipped": skipped++
+	}
+	}
+
+	fmt.Printf("\n=== Rule generation summary ===\n")
+	fmt.Printf("Created: %d  Updated: %d  Unchanged/Skipped: %d\n", created, updated, skipped)
+
+	if updated > 0 {
+	fmt.Println("\n-- Updated files (diffs) --")
+	for _, c := range changeLog {
+		if c.Status == "updated" {
+		fmt.Printf("\n[%s]\n%s\n", c.Path, c.Diff)
+		}
+	}
+	}
+	if created > 0 {
+	fmt.Println("\n-- Created files --")
+	for _, c := range changeLog {
+		if c.Status == "created" {
+		fmt.Printf("  %s\n", c.Path)
+		}
+	}
+	}
+	if skipped > 0 {
+	fmt.Println("\n-- Unchanged (skipped write) --")
+	for _, c := range changeLog {
+		if c.Status == "skipped" {
+		fmt.Printf("  %s\n", c.Path)
+		}
+	}
+	}
+	fmt.Println("================================")
 }
 
 // checkOrphanedMappings finds mapping files that don't have corresponding Terraform resources
@@ -349,6 +412,16 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 	// Parse the API reference (e.g., "CreateLakehouseRequest.displayName")
 	parts := strings.Split(attr.ApiRef, ".")
 
+	// Support dot-notation "block.attr" in mapping attribute name
+	attrName := attr.Name
+	var blockName *string
+	if strings.Contains(attrName, ".") {
+		s := strings.SplitN(attrName, ".", 2)
+		b := s[0]
+		blockName = &b
+		attrName = s[1]
+	}
+
 	// If only property name is provided, try to infer the request object
 	if len(parts) == 1 {
 		inferredApiRef := inferRequestObject(mapping.Resource, attr.ApiRef, apiSpec)
@@ -405,6 +478,9 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 		definition = defMap
 	}
 
+	// Resolve $ref if present (local or external file)
+	definition = resolveAllRefs(filepath.Dir(filepath.Join(SpecsPath, mapping.ImportPath)), definition)
+
 	// Create manual constraints from attribute mapping
 	manualConstraints := &manualConstraint{
 		MaxLength:    attr.MaxLength,
@@ -412,11 +488,14 @@ func processAttributeMapping(apiSpec apiSpec, mapping mapping, attr attributeMap
 		Pattern:      attr.Pattern,
 		WarnOnExceed: attr.WarnOnExceed,
 		ValidValues:  attr.ValidValues,
+		KeyPattern:   attr.KeyPattern,
+		TypeHint:     attr.TypeHint,
+		ReadOnly:     attr.ReadOnly,		
 	}
 
 	// Check if we have valid constraints
 	if validMapping(definition, manualConstraints) {
-		ref := attributeRef{resource: mapping.Resource, attribute: attr.Name}
+		ref := attributeRef{resource: mapping.Resource, block: blockName, attribute: attrName}
 		attrSchema := extractAttrSchema(ref, definition, manualConstraints)
 
 		// Skip if attribute not found in Terraform provider
@@ -436,8 +515,12 @@ func validMapping(definition map[string]interface{}, manualConstraints *manualCo
 	// Check if we have manual constraints
 	if manualConstraints != nil {
 		if manualConstraints.MaxLength != nil || manualConstraints.MinLength != nil ||
-			manualConstraints.Pattern != nil || len(manualConstraints.ValidValues) > 0 {
+			manualConstraints.Pattern != nil || len(manualConstraints.ValidValues) > 0 ||
+			manualConstraints.KeyPattern != nil || manualConstraints.TypeHint != nil {
 			return true
+		}
+		if manualConstraints.ReadOnly != nil && *manualConstraints.ReadOnly {
+			return false
 		}
 	}
 
@@ -467,10 +550,10 @@ func validMapping(definition map[string]interface{}, manualConstraints *manualCo
 			return true
 		}
 		if _, ok := definition["format"]; ok {
-			format := definition["format"].(string)
+			format, _ := definition["format"].(string)
 			// Skip UUID validation - these are almost always Terraform references
 			// Valid formats that we can validate
-			if format == "date-time" {
+			if format == "date-time" || format == "uuid" || format == "uri" {
 				return true
 			}
 		}
@@ -483,6 +566,9 @@ func validMapping(definition map[string]interface{}, manualConstraints *manualCo
 			return true
 		}
 		return false
+	case "boolean":
+		// allow boolean when manual pattern/enum provided
+		return true		
 	default:
 		return false
 	}
@@ -520,6 +606,10 @@ func extractAttrSchema(ref attributeRef, definition map[string]interface{}, manu
 	}
 
 	if !hasType || defTypeRaw == nil {
+		// allow manual constraints (type_hint, pattern, etc.)
+		if manualConstraints != nil && (manualConstraints.Pattern != nil || len(manualConstraints.ValidValues) > 0 || manualConstraints.TypeHint != nil) {
+			return attrSchema
+		}
 		fmt.Printf("⚠️  Warning: `%s` has no type in API definition, skipping\n", ref.String())
 		return attribute{}
 	}
@@ -537,11 +627,16 @@ func extractAttrSchema(ref attributeRef, definition map[string]interface{}, manu
 	switch defType {
 	case "string":
 		if ty != "string" && ty != "number" {
-			panic(fmt.Sprintf("`%s` is expected as string, but got (%s)", ref.String(), attrSchema.Type))
+			fmt.Printf("⚠️  Type mismatch for `%s` (spec string vs provider %s) — continuing due to manual/type_hint support\n", ref.String(), attrSchema.Type)
 		}
 	case "integer", "number":
 		if ty != "number" && ty != "string" {
-			panic(fmt.Sprintf("`%s` is expected as number, but got (%s)", ref.String(), attrSchema.Type))
+			fmt.Printf("⚠️  Type mismatch for `%s` (spec number vs provider %s) — continuing due to manual/type_hint support\n", ref.String(), attrSchema.Type)
+		}
+	case "boolean":
+		// allow boolean with string/number schema (rare), just warn
+		if ty != "bool" && ty != "string" && ty != "number" {
+			fmt.Printf("⚠️  Type mismatch for `%s` (spec boolean vs provider %s)\n", ref.String(), attrSchema.Type)
 		}
 	}
 
@@ -571,6 +666,15 @@ func generateRuleFile(mapping mapping, ref attributeRef, definition map[string]i
 		Format:        fetchString(definition, "format"),
 		ReadOnly:      fetchBool(definition, "readOnly"),
 		ReferenceURL:  fmt.Sprintf("https://github.com/microsoft/fabric-rest-api-specs/tree/main/%s", strings.TrimPrefix(mapping.ImportPath, "./")),
+	}
+
+	// Apply manual type hints
+	if manualConstraints != nil && manualConstraints.TypeHint != nil {
+		meta.Format = *manualConstraints.TypeHint
+	}
+	// Support map key pattern (if provided, your rule template can read this via Pattern)
+	if manualConstraints != nil && manualConstraints.KeyPattern != nil && meta.Pattern == "" {
+		meta.Pattern = *manualConstraints.KeyPattern
 	}
 
 	// Priority: manual constraints > schema.json > API spec
@@ -674,6 +778,81 @@ func generateRuleFile(mapping mapping, ref attributeRef, definition map[string]i
 	return meta
 }
 
+// New: process resource-level constraints (e.g., XOR between attributes)
+func processConstraints(m mapping) {
+	for _, c := range m.Constraints {
+		if len(c.OneOf) == 0 {
+			continue
+		}
+		ruleName := fmt.Sprintf("%s_constraint_%s", m.Resource, c.Name)
+		meta := &ruleMeta{
+			RuleName:   ruleName,
+			RuleNameCC: toCamelCase(ruleName),
+			ResourceType: m.Resource,
+			Pattern: strings.Join(c.OneOf, ","), // pass list via Pattern for template
+		}
+		if c.Message != "" {
+			meta.ReferenceURL = c.Message // reuse field to carry message into template
+		}
+		generateFile(fmt.Sprintf("%s/apispec/%s.go", RulesPath, ruleName), getFullPath("rule_xor.go.tmpl"), meta)
+		generatedRuleNames = append(generatedRuleNames, meta.RuleName)
+		generatedRuleNameCCs = append(generatedRuleNameCCs, meta.RuleNameCC)
+	}
+}
+
+// Resolve $ref (single level)
+func resolveRef(baseDir string, node map[string]interface{}) map[string]interface{} {
+	ref, ok := node["$ref"].(string)
+	if !ok || ref == "" {
+		return node
+	}
+	file := ""
+	ptr := ""
+	if strings.Contains(ref, "#") {
+		s := strings.SplitN(ref, "#", 2)
+		file, ptr = s[0], s[1]
+	} else {
+		file = ref
+	}
+	var doc map[string]interface{}
+	if file == "" {
+		return node
+	}
+	full := filepath.Clean(filepath.Join(baseDir, file))
+	raw, err := os.ReadFile(full)
+	if err != nil { return node }
+	if err := json.Unmarshal(raw, &doc); err != nil { return node }
+	if ptr == "" { 
+		if m, ok := doc["definitions"].(map[string]interface{}); ok {
+			return m
+		}
+		return doc
+	}
+	if strings.HasPrefix(ptr, "/") {
+		cur := any(doc).(map[string]interface{})
+		for _, seg := range strings.Split(ptr[1:], "/") {
+			nxt, ok := cur[seg]
+			if !ok { return node }
+			if m, ok := nxt.(map[string]interface{}); ok { cur = m } else { return node }
+		}
+		return cur
+	}
+	return node
+}
+
+// Resolve $ref recursively
+func resolveAllRefs(baseDir string, node map[string]interface{}) map[string]interface{} {
+	out := node
+	for {
+		prev := out
+		out = resolveRef(baseDir, out)
+		if fmt.Sprintf("%p", prev) == fmt.Sprintf("%p", out) {
+			break
+		}
+	}
+	return out
+}
+
 func generateProviderFile(ruleNames []string) {
 	meta := &providerMeta{RuleNameCCList: ruleNames}
 	generateFile(fmt.Sprintf("%s/apispec/provider.go", RulesPath), getFullPath("provider.go.tmpl"), meta)
@@ -686,7 +865,12 @@ func generateRulesIndexDoc(ruleNames []string) {
 
 func fetchNumber(definition map[string]interface{}, key string) int {
 	if v, ok := definition[key]; ok {
-		return int(v.(float64))
+		switch t := v.(type) {
+		case float64:
+			return int(t)
+		case int:
+			return t
+		}
 	}
 	return 0
 }
@@ -698,47 +882,93 @@ func numberExists(definition map[string]interface{}, key string) bool {
 
 func fetchString(definition map[string]interface{}, key string) string {
 	if v, ok := definition[key]; ok {
-		return v.(string)
+		if s, ok := v.(string); ok { return s }
 	}
 	return ""
 }
 
 func fetchBool(definition map[string]interface{}, key string) bool {
 	if v, ok := definition[key]; ok {
-		return v.(bool)
+		if b, ok := v.(bool); ok { return b }
 	}
 	return false
 }
 
 func fetchStrings(definition map[string]interface{}, key string) []string {
 	if raw, ok := definition[key]; ok {
-		list := raw.([]interface{})
-		ret := make([]string, len(list))
-		for i, v := range list {
-			ret[i] = v.(string)
+		if list, ok := raw.([]interface{}); ok {
+			ret := make([]string, 0, len(list))
+			for _, v := range list {
+				if s, ok := v.(string); ok {
+					ret = append(ret, s)
+				}
+			}
+			return ret
 		}
-		return ret
 	}
-	return []string{}
+	return nil
 }
 
-func generateFile(fileName string, tmplName string, meta interface{}) {
-	dir := filepath.Dir(fileName)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		panic(err)
-	}
+func generateFile(fileName string, tmplPath string, meta any) {
+  // parse template with helper funcs (needed by rule_xor.go.tmpl)
+  tmpl := template.Must(
+    template.New(path.Base(tmplPath)).
+      Funcs(template.FuncMap{
+        "split": strings.Split,
+        "join":  strings.Join,
+      }).
+      ParseFiles(tmplPath),
+  )
 
-	file, err := os.Create(fileName)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
+  // render to memory
+  var buf bytes.Buffer
+  if err := tmpl.Execute(&buf, meta); err != nil {
+    panic(err)
+  }
+  newContent := buf.Bytes()
 
-	tmpl := template.Must(template.ParseFiles(tmplName))
-	err = tmpl.Execute(file, meta)
-	if err != nil {
-		panic(err)
-	}
+  // read old file if exists
+  oldContent, _ := os.ReadFile(fileName)
+  same := len(oldContent) > 0 && sha256.Sum256(oldContent) == sha256.Sum256(newContent)
+
+  if same {
+    changeLog = append(changeLog, ChangeRecord{Path: fileName, Status: "skipped"})
+    return
+  }
+
+  if err := os.MkdirAll(filepath.Dir(fileName), 0o755); err != nil {
+    panic(err)
+  }
+  if err := os.WriteFile(fileName, newContent, 0o644); err != nil {
+    panic(err)
+  }
+
+  if len(oldContent) == 0 {
+    changeLog = append(changeLog, ChangeRecord{Path: fileName, Status: "created"})
+  } else {
+    changeLog = append(changeLog, ChangeRecord{
+      Path:   fileName,
+      Status: "updated",
+      Diff:   quickLineDiff(string(oldContent), string(newContent), 200),
+    })
+  }
+}
+
+func quickLineDiff(a, b string, max int) string {
+  as := strings.Split(a, "\n")
+  bs := strings.Split(b, "\n")
+  var out strings.Builder
+  i, j, shown := 0, 0, 0
+  for i < len(as) && j < len(bs) {
+    if as[i] == bs[j] { i++; j++; continue }
+    if shown >= max { out.WriteString("... (diff truncated)\n"); break }
+    out.WriteString("- " + as[i] + "\n")
+    out.WriteString("+ " + bs[j] + "\n")
+    i++; j++; shown++
+  }
+  for ; shown < max && i < len(as); i, shown = i+1, shown+1 { out.WriteString("- " + as[i] + "\n") }
+  for ; shown < max && j < len(bs); j, shown = j+1, shown+1 { out.WriteString("+ " + bs[j] + "\n") }
+  return out.String()
 }
 
 var heading = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")

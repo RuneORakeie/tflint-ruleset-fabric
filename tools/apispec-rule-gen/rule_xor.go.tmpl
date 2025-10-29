@@ -1,0 +1,39 @@
+package apispec
+
+import (
+	"strings"
+
+	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+)
+
+type {{ .RuleNameCC }} struct{ tflint.DefaultRule }
+
+func New{{ .RuleNameCC }}() *{{ .RuleNameCC }} { return &{{ .RuleNameCC }}{} }
+
+func (r *{{ .RuleNameCC }}) Name() string    { return "{{ .RuleName }}" }
+func (r *{{ .RuleNameCC }}) Enabled() bool   { return true }
+func (r *{{ .RuleNameCC }}) Severity() string{ return tflint.ERROR }
+func (r *{{ .RuleNameCC }}) Link() string    { return "{{ .ReferenceURL }}" }
+
+func (r *{{ .RuleNameCC }}) Check(runner tflint.Runner) error {
+	fields := []string{ {{- range (split .Pattern ",") }}"{{ . }}",{{- end }} }
+
+	msg := "{{ .ReferenceURL }}"
+	if msg == "" {
+		msg = "Exactly one of these must be set: " + strings.Join(fields, ", ")
+	}
+
+	return helper.ForEachResource(runner, "{{ .ResourceType }}", func(res *helper.Resource) error {
+		count := 0
+		for _, f := range fields {
+			if res.GetAttribute(f) != nil {
+				count++
+			}
+		}
+		if count != 1 {
+			return runner.EmitIssue(r, msg, res.DefRange)
+		}
+		return nil
+	})
+}
