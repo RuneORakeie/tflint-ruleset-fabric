@@ -1,22 +1,24 @@
 # TFLint Ruleset for Fabric Terraform Provider
+[![Build Status](https://github.com/RuneORakeie/tflint-ruleset-fabric/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/RuneORakeie/tflint-ruleset-fabric/actions)
+[![GitHub release](https://img.shields.io/github/release/RuneORakeie/tflint-ruleset-fabric.svg)](https://github.com/RuneORakeie/tflint-ruleset-fabric/releases/latest)
+[![codecov](https://codecov.io/gh/RuneORakeie/tflint-ruleset-fabric/branch/main/graph/badge.svg?token=BNJI183RPY)](https://codecov.io/gh/RuneORakeie/tflint-ruleset-fabric)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 A comprehensive TFLint ruleset plugin for validating Terraform configurations using the Microsoft Fabric provider. This ruleset provides **70+ validation rules** covering best practices, schema constraints, and business logic for Fabric resources.
-
-[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 ## Features
 
 ### 🎯 70+ Validation Rules
 
 **Business Logic Rules (17)** - Custom governance and best practice rules:
-- ✅ Workspace capacity and description requirements
+- ✅ Workspace capacity requirements
 - ✅ Role assignment validation across workspaces, domains, gateways, and pipelines
 - ✅ Git integration validation (Azure DevOps & GitHub)
 - ✅ Deployment pipeline stage validation (count, naming, descriptions)
 - ✅ Domain contributor scope validation
 - ✅ Capacity region availability checks
 
-**API Spec Rules (53)** - Auto-generated from Fabric API specifications:
+**API Spec Rules (58)** - Auto-generated from Fabric API specifications:
 - ✅ Display name length validation (123-256 chars depending on resource)
 - ✅ Description length validation (256-1024 chars)
 - ✅ Enum value validation (roles, connectivity types, privacy levels)
@@ -26,74 +28,39 @@ A comprehensive TFLint ruleset plugin for validating Terraform configurations us
 ## Requirements
 
 - TFLint v0.42+
-- Go v1.21+
+- Go v1.24+
 - Terraform v1.0+
 
 ## Installation
 
-### From Source
+### From Release
 
-```bash
-git clone https://github.com/RuneORakeie/tflint-ruleset-fabric
-cd tflint-ruleset-fabric
-make build
-make install
-```
-
-### From Release (Future)
-
-```bash
+```sh
 # Add to .tflint.hcl
 plugin "fabric" {
   enabled = true
   version = "0.1.0"
   source  = "github.com/RuneORakeie/tflint-ruleset-fabric"
+  signing_key = <<-KEY
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEaPIddRYJKwYBBAHaRw8BAQdA97T9Pw1tHwmuoCHx5Od2jRErjYQLMkGtjzHa
+n/OtVO+0LlJ1bmUgT3ZsaWVuIFJha2VpZSA8cnVuZS5yYWtlaWVAdGlldG9ldnJ5
+LmNvbT6ImQQTFgoAQRYhBDnXUAR+SpStNuTHwcE/gmmRiGC6BQJo8h11AhsDBQkD
+wmcABQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEME/gmmRiGC6clQBAN4b
+xNef3oASq2YWhyDJGoKavDGsTr9CJZkZ66EBPx+zAQDhrFEpylND2qtxQG8x0O5C
+cXAcWbXr1DcxbJMEngtZCLg4BGjyHXUSCisGAQQBl1UBBQEBB0B7RETmxgBs7+xU
++MC1lY8ns3V2jnkf/JDAqDymDCcEcgMBCAeIfgQYFgoAJhYhBDnXUAR+SpStNuTH
+wcE/gmmRiGC6BQJo8h11AhsMBQkDwmcAAAoJEME/gmmRiGC6XP4A/2x6serOfr3l
+8uRNXHoxoKfKAxtcT4JjXGb3NMuc1DfVAP4zy+0wZb8/6jpRriVphm63Y0LjVFv0
+3mMMNhrYbuc0AA==
+=4jLr
+-----END PGP PUBLIC KEY BLOCK-----
+KEY  
 }
 
 # Then run
 tflint --init
-```
-
-## Quick Start
-
-1. **Create `.tflint.hcl` in your Terraform project:**
-
-```hcl
-plugin "fabric" {
-  enabled = true
-}
-
-# Enable business logic rules
-rule "fabric_workspace_capacity_required" {
-  enabled = true
-}
-
-rule "fabric_workspace_description_required" {
-  enabled = true
-}
-
-rule "fabric_role_assignment_recommended" {
-  enabled = true
-}
-
-rule "fabric_item_description_recommended" {
-  enabled = true
-}
-
-# Git integration rules
-rule "fabric_workspace_git_provider_valid" {
-  enabled = true
-}
-
-rule "fabric_workspace_git_directory_name_format" {
-  enabled = true
-}
-```
-
-2. **Run TFLint:**
-
-```bash
-tflint
 ```
 
 ## Usage Examples
@@ -194,167 +161,6 @@ resource "fabric_deployment_pipeline" "example" {
 }
 ```
 
-## Complete Rule List
-
-### Business Logic Rules
-
-| Rule | Severity | Description | Enabled by Default |
-|------|----------|-------------|-------------------|
-| `fabric_capacity_region_valid` | WARNING | Validates capacity regions support all workloads | No |
-| `fabric_deployment_pipeline_stages_count` | ERROR | Ensures 2-10 stages in deployment pipelines | Yes |
-| `fabric_deployment_pipeline_stages_description_length` | ERROR | Validates stage description ≤ 1024 chars | Yes |
-| `fabric_deployment_pipeline_stages_display_name_length` | ERROR | Validates stage display name ≤ 256 chars | Yes |
-| `fabric_domain_contributors_scope` | ERROR | Validates contributor scope values | Yes |
-| `fabric_item_description_recommended` | WARNING | Recommends descriptions for governance | Yes |
-| `fabric_role_assignment_recommended` | WARNING | Warns when resources lack role assignments | Yes |
-| `fabric_workspace_capacity_required` | ERROR | Requires capacity assignment | Yes |
-| `fabric_workspace_description_required` | WARNING | Requires workspace descriptions | Yes |
-| `fabric_workspace_git_azdo_attributes_required` | ERROR | Validates Azure DevOps git attributes | Yes |
-| `fabric_workspace_git_credentials_source_valid` | ERROR | Validates credentials source | Yes |
-| `fabric_workspace_git_directory_name_format` | ERROR | Validates directory name format (starts with /) | Yes |
-| `fabric_workspace_git_github_attributes_required` | ERROR | Validates GitHub git attributes | Yes |
-| `fabric_workspace_git_initialization_strategy_valid` | ERROR | Validates initialization strategy | Yes |
-| `fabric_workspace_git_provider_valid` | ERROR | Validates git provider type | Yes |
-| `fabric_workspace_git_string_lengths` | ERROR | Validates git string lengths | Yes |
-| `fabric_workspace_role_assignment_role` | ERROR | Validates workspace role values | Yes |
-
-### API Spec Rules (Auto-generated)
-
-<details>
-<summary><b>Display Name Rules (26 rules)</b></summary>
-
-- `fabric_activator_invalid_display_name`
-- `fabric_apache_airflow_job_invalid_display_name`
-- `fabric_connection_invalid_display_name`
-- `fabric_copy_job_invalid_display_name`
-- `fabric_data_pipeline_invalid_display_name`
-- `fabric_dataflow_invalid_display_name`
-- `fabric_deployment_pipeline_invalid_display_name`
-- `fabric_digital_twin_builder_invalid_display_name`
-- `fabric_domain_invalid_display_name`
-- `fabric_environment_invalid_display_name`
-- `fabric_eventhouse_invalid_display_name`
-- `fabric_eventstream_invalid_display_name`
-- `fabric_folder_invalid_display_name`
-- `fabric_gateway_invalid_display_name`
-- `fabric_graphql_api_invalid_display_name`
-- `fabric_kql_dashboard_invalid_display_name`
-- `fabric_kql_database_invalid_display_name`
-- `fabric_kql_queryset_invalid_display_name`
-- `fabric_lakehouse_invalid_display_name`
-- `fabric_mirrored_database_invalid_display_name`
-- `fabric_ml_experiment_invalid_display_name`
-- `fabric_ml_model_invalid_display_name`
-- `fabric_mounted_data_factory_invalid_display_name`
-- `fabric_notebook_invalid_display_name`
-- `fabric_report_invalid_display_name`
-- `fabric_semantic_model_invalid_display_name`
-- `fabric_spark_job_definition_invalid_display_name`
-- `fabric_sql_database_invalid_display_name`
-- `fabric_variable_library_invalid_display_name`
-- `fabric_warehouse_invalid_display_name`
-- `fabric_warehouse_snapshot_invalid_display_name`
-- `fabric_workspace_invalid_display_name`
-</details>
-
-<details>
-<summary><b>Description Rules (21 rules)</b></summary>
-
-- `fabric_activator_invalid_description`
-- `fabric_apache_airflow_job_invalid_description`
-- `fabric_copy_job_invalid_description`
-- `fabric_data_pipeline_invalid_description`
-- `fabric_dataflow_invalid_description`
-- `fabric_deployment_pipeline_invalid_description`
-- `fabric_digital_twin_builder_invalid_description`
-- `fabric_domain_invalid_description`
-- `fabric_environment_invalid_description`
-- `fabric_eventhouse_invalid_description`
-- `fabric_eventstream_invalid_description`
-- `fabric_graphql_api_invalid_description`
-- `fabric_kql_dashboard_invalid_description`
-- `fabric_kql_database_invalid_description`
-- `fabric_kql_queryset_invalid_description`
-- `fabric_lakehouse_invalid_description`
-- `fabric_mirrored_database_invalid_description`
-- `fabric_ml_experiment_invalid_description`
-- `fabric_ml_model_invalid_description`
-- `fabric_mounted_data_factory_invalid_description`
-- `fabric_notebook_invalid_description`
-- `fabric_report_invalid_description`
-- `fabric_semantic_model_invalid_description`
-- `fabric_spark_job_definition_invalid_description`
-- `fabric_sql_database_invalid_description`
-- `fabric_variable_library_invalid_description`
-- `fabric_warehouse_invalid_description`
-- `fabric_warehouse_snapshot_invalid_description`
-- `fabric_workspace_invalid_description`
-</details>
-
-<details>
-<summary><b>Other API Spec Rules (6 rules)</b></summary>
-
-- `fabric_connection_invalid_connectivity_type`
-- `fabric_connection_invalid_privacy_level`
-- `fabric_gateway_invalid_inactivity_minutes_before_sleep`
-- `fabric_gateway_invalid_type`
-- `fabric_spark_custom_pool_invalid_node_family`
-- `fabric_spark_custom_pool_invalid_node_size`
-- `fabric_spark_environment_settings_invalid_driver_cores`
-- `fabric_spark_environment_settings_invalid_driver_memory`
-- `fabric_spark_environment_settings_invalid_executor_cores`
-- `fabric_spark_environment_settings_invalid_executor_memory`
-- `fabric_spark_environment_settings_invalid_runtime_version`
-</details>
-
-## Configuration
-
-### Rule Presets
-
-**Minimal (Errors only):**
-```hcl
-plugin "fabric" {
-  enabled = true
-}
-
-# Only enable ERROR severity rules
-rule "fabric_workspace_capacity_required" {
-  enabled = true
-}
-
-rule "fabric_deployment_pipeline_stages_count" {
-  enabled = true
-}
-```
-
-**Recommended (Errors + Warnings):**
-```hcl
-plugin "fabric" {
-  enabled = true
-}
-
-# All business logic rules
-rule "fabric_*" {
-  enabled = true
-}
-```
-
-**Strict (All rules):**
-```hcl
-plugin "fabric" {
-  enabled = true
-}
-
-# Enable all rules including API spec rules
-rule "fabric_*" {
-  enabled = true
-}
-
-rule "fabric_*_invalid_*" {
-  enabled = true
-}
-```
-
 ## Development
 
 ### Project Structure
@@ -367,14 +173,15 @@ rule "fabric_*_invalid_*" {
 │   ├── fabric_deployment_*.go          # Deployment rules
 │   ├── apispec/                        # Auto-generated API rules
 │   │   ├── provider.go
-│   │   └── fabric_*_invalid_*.go
+│   │   ├── fabric_*_invalid_*.go
+│   │   └── generated_rules_test.go     # Tests
 │   ├── business_logic_rules_test.go    # Tests
-│   └── generated_rules_test.go
 ├── docs/
 │   └── rules/                          # Rule documentation
 │       └── *.md
 ├── tools/
 │   └── apispec-rule-gen/               # Code generator
+│   └── apispec-mapping-gen/            # Mapping from Fabric API Specs generator
 ├── Makefile
 └── go.mod
 ```
