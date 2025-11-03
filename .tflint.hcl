@@ -3,8 +3,6 @@
 # Enable the Fabric ruleset plugin
 plugin "fabric" {
   enabled = true
-  version = "0.1.0"
-  source  = "github.com/RuneORakeie/tflint-ruleset-fabric"
 }
 
 # ============================================

@@ -70,7 +70,6 @@ jobs:
       # Run TFLint with Fabric ruleset
       - name: Run TFLint
         run: |
-          cd integration/basic
           tflint \
             --format=compact \
             --minimum-failure-severity=warning
