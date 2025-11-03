@@ -13,31 +13,6 @@ rule "fabric_workspace_capacity_required" {
 }
 
 # ============================================
-# Fabric Role Assignment Recommended
-# ============================================
-rule "fabric_role_assignment_recommended" {
-  enabled = true
-}
-
-# ============================================
-# Fabric Git Integration Provider Validation
-# ============================================
-rule "fabric_git_integration_provider_valid" {
-  enabled = true
-  
-  # Supported providers: GitHub, Azure DevOps
-}
-
-# ============================================
-# Fabric Capacity Region Validation
-# ============================================
-rule "fabric_capacity_region_valid" {
-  enabled = true  
-  
-  # When enabled, validates regions against available Azure regions
-}
-
-# ============================================
 # Terraform Language Rules
 # ============================================
 
