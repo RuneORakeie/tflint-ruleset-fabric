@@ -57,8 +57,11 @@ jobs:
       - name: Build Fabric Plugin
         run: |
           make build
-          mkdir -p ~/.tflint.d/plugins/github.com/RuneORakeie/tflint-ruleset-fabric/0.1.0/linux_amd64
-          cp tflint-ruleset-fabric ~/.tflint.d/plugins/github.com/RuneORakeie/tflint-ruleset-fabric/0.1.0/linux_amd64/tflint-ruleset-fabric
+          PLUGIN_DIR="${HOME}/.tflint.d/plugins/github.com/runeorakeie/tflint-ruleset-fabric/0.1.0/linux_amd64"
+          mkdir -p "${PLUGIN_DIR}"
+          cp tflint-ruleset-fabric "${PLUGIN_DIR}/tflint-ruleset-fabric"
+          chmod +x "${PLUGIN_DIR}/tflint-ruleset-fabric"
+          ls -la "${PLUGIN_DIR}"
 
       # Skip tflint --init since we built the plugin manually
       # The plugin is already installed in the correct location
