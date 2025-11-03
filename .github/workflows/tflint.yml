@@ -57,7 +57,7 @@ jobs:
       - name: Build Fabric Plugin
         run: |
           make build
-          PLUGIN_DIR="${PWD}/.tflint.d/plugins"
+          PLUGIN_DIR="${HOME}/.tflint.d/plugins"
           mkdir -p "${PLUGIN_DIR}"
           cp tflint-ruleset-fabric "${PLUGIN_DIR}/tflint-ruleset-fabric"
           chmod +x "${PLUGIN_DIR}/tflint-ruleset-fabric"
@@ -74,8 +74,6 @@ jobs:
           tflint \
             --format=compact \
             --minimum-failure-severity=warning
-        env:
-          TFLINT_PLUGIN_DIR: ${{ github.workspace }}/.tflint.d/plugins
         continue-on-error: false
 
       # Format check (optional)
