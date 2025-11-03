@@ -226,6 +226,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 ## Links
 
 - 📚 [Rule Documentation](docs/rules/)
+- ⚙️ [Configuration Guide](docs/CONFIGURATION.md)
 - 🔧 [TFLint Documentation](https://github.com/terraform-linters/tflint)
 - 🔌 [TFLint Plugin SDK](https://github.com/terraform-linters/tflint-plugin-sdk)
 - ☁️ [Microsoft Fabric Terraform Provider](https://github.com/microsoft/terraform-provider-fabric)

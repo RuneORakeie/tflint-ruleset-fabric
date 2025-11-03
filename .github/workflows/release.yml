@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write  # Required for Cosign keyless signing
 
 jobs:
   release:
@@ -24,12 +25,8 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
-        id: import_gpg
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.0.0
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -38,5 +35,6 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - uses: actions/attest-build-provenance@v3
+        with:
+         subject-path: 'dist/checksums.txt'
