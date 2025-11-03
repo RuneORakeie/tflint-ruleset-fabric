@@ -57,10 +57,11 @@ jobs:
       - name: Build Fabric Plugin
         run: |
           make build
-          PLUGIN_DIR="${HOME}/.tflint.d/plugins/github.com/runeorakeie/tflint-ruleset-fabric/0.1.0/linux_amd64"
+          PLUGIN_DIR="${PWD}/.tflint.d/plugins"
           mkdir -p "${PLUGIN_DIR}"
           cp tflint-ruleset-fabric "${PLUGIN_DIR}/tflint-ruleset-fabric"
           chmod +x "${PLUGIN_DIR}/tflint-ruleset-fabric"
+          echo "Plugin installed at:"
           ls -la "${PLUGIN_DIR}"
 
       # Skip tflint --init since we built the plugin manually
@@ -73,6 +74,8 @@ jobs:
           tflint \
             --format=compact \
             --minimum-failure-severity=warning
+        env:
+          TFLINT_PLUGIN_DIR: ${{ github.workspace }}/.tflint.d/plugins
         continue-on-error: false
 
       # Format check (optional)
