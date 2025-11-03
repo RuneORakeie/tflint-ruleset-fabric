@@ -42,9 +42,6 @@ rule "fabric_capacity_region_valid" {
 # ============================================
 # Terraform Language Rules
 # ============================================
-rule "terraform_required_providers" {
-  enabled = true
-}
 
 rule "terraform_required_version" {
   enabled = true
