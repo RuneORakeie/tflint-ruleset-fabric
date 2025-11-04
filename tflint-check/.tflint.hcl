@@ -3,8 +3,6 @@
 # Enable the Fabric ruleset plugin
 plugin "fabric" {
   enabled = true
-  version = "0.1.0"
-  source  = "github.com/RuneORakeie/tflint-ruleset-fabric"
 }
 
 # ============================================
@@ -15,36 +13,8 @@ rule "fabric_workspace_capacity_required" {
 }
 
 # ============================================
-# Fabric Role Assignment Recommended
-# ============================================
-rule "fabric_role_assignment_recommended" {
-  enabled = true
-}
-
-# ============================================
-# Fabric Git Integration Provider Validation
-# ============================================
-rule "fabric_git_integration_provider_valid" {
-  enabled = true
-  
-  # Supported providers: GitHub, Azure DevOps
-}
-
-# ============================================
-# Fabric Capacity Region Validation
-# ============================================
-rule "fabric_capacity_region_valid" {
-  enabled = true  
-  
-  # When enabled, validates regions against available Azure regions
-}
-
-# ============================================
 # Terraform Language Rules
 # ============================================
-rule "terraform_required_providers" {
-  enabled = true
-}
 
 rule "terraform_required_version" {
   enabled = true

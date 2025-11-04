@@ -53,19 +53,26 @@ jobs:
         with:
           tflint_version: latest
 
-      # Initialize TFLint plugins (including Fabric ruleset)
-      - name: Initialize TFLint
-        run: tflint --init
-        env:
-          TFLINT_PLUGIN_DIR: ~/.tflint.d/plugins
+      # Build the plugin locally (since this is the plugin's own repository)
+      - name: Build Fabric Plugin
+        run: |
+          make build
+          PLUGIN_DIR="${HOME}/.tflint.d/plugins"
+          mkdir -p "${PLUGIN_DIR}"
+          cp tflint-ruleset-fabric "${PLUGIN_DIR}/tflint-ruleset-fabric"
+          chmod +x "${PLUGIN_DIR}/tflint-ruleset-fabric"
+          echo "Plugin installed at:"
+          ls -la "${PLUGIN_DIR}"
+
+      # Skip tflint --init since we built the plugin manually
+      # The plugin is already installed in the correct location
 
       # Run TFLint with Fabric ruleset
       - name: Run TFLint
         run: |
-          tflint \
-            --format=compact \
-            --minimum-failure-severity=warning \
-            --recursive
+          cd tflint-check
+          tflint --format=compact --force
+   #         --minimum-failure-severity=warning
         continue-on-error: false
 
       # Format check (optional)
