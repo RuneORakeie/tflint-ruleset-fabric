@@ -71,7 +71,7 @@ jobs:
       - name: Run TFLint
         run: |
           cd tflint-check
-          tflint --format=compact 
+          tflint --format=compact --force
    #         --minimum-failure-severity=warning
         continue-on-error: false
 
